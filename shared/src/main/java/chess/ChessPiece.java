@@ -2,6 +2,7 @@ package chess;
 
 import chess.piecesmoves.BishopMoves;
 import chess.piecesmoves.KingMoves;
+import chess.piecesmoves.QueenMoves;
 import chess.piecesmoves.RookMoves;
 
 import java.util.Collection;
@@ -62,7 +63,7 @@ public class ChessPiece {
             case KING:
                 return KingMoves.kingMoves(board, myPosition);
             case QUEEN:
-                break;
+                return QueenMoves.queenMoves(board, myPosition);
             case BISHOP:
                 return BishopMoves.bishopMoves(board, myPosition);
             case KNIGHT:

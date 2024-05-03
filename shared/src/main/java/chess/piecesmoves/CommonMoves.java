@@ -4,7 +4,7 @@ import chess.*;
 import java.util.HashSet;
 
 public class CommonMoves {
-    public static HashSet<ChessMove> checkDiagonal(ChessBoard board, ChessPosition currentPosition, int colDirection, int rowDirection) {
+    public static HashSet<ChessMove> checkMovements(ChessBoard board, ChessPosition currentPosition, int colDirection, int rowDirection) {
         HashSet<ChessMove> validPositions = new HashSet<>();
         int x = currentPosition.getColumn();
         int y = currentPosition.getRow();
