@@ -41,7 +41,7 @@ public class ChessPosition {
                 ", col=" + col +
                 '}';
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

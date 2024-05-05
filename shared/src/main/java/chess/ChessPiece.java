@@ -1,9 +1,6 @@
 package chess;
 
-import chess.piecesmoves.BishopMoves;
-import chess.piecesmoves.KingMoves;
-import chess.piecesmoves.QueenMoves;
-import chess.piecesmoves.RookMoves;
+import chess.piecesmoves.*;
 
 import java.util.Collection;
 import java.util.ArrayList;
@@ -68,7 +65,7 @@ public class ChessPiece {
             case BISHOP:
                 return BishopMoves.bishopMoves(board, myPosition);
             case KNIGHT:
-                break;
+                return KnightMoves.knightMoves(board, myPosition);
             case ROOK:
                 return RookMoves.rookMoves(board, myPosition);
             case PAWN:
