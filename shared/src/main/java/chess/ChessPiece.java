@@ -69,7 +69,7 @@ public class ChessPiece {
             case ROOK:
                 return RookMoves.rookMoves(board, myPosition);
             case PAWN:
-                break;
+                return PawnMoves.knightMoves(board, myPosition);
         }
 
         return new ArrayList<>();
