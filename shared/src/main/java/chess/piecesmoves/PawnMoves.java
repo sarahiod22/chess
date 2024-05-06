@@ -6,7 +6,7 @@ import com.sun.source.tree.BreakTree;
 import java.util.HashSet;
 
 public class PawnMoves {
-    public static HashSet<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+    public static HashSet<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> validPositions = new HashSet<>();
         int direction = (board.getPiece(myPosition).getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
         int startPosition = (direction == 1) ? 2 : 7;
@@ -15,23 +15,23 @@ public class PawnMoves {
         int y = myPosition.getRow();
 
         //move 1 step forward
-        if ((board.getPiece(new ChessPosition(y+direction, x)) == null) && (checkBounds(new ChessPosition(y + direction, x)))) {
+        if ((checkBounds(new ChessPosition(y + direction, x))) && (board.getPiece(new ChessPosition(y+direction, x)) == null)) {
             if(!checkPromotion(myPosition, new ChessPosition(y + direction, x), promoPosition, validPositions)) {
                 validPositions.add(new ChessMove(myPosition, new ChessPosition(y + direction, x), null));
             }
         }
         //move 2 step forward
-        if ((y == startPosition) && (board.getPiece(new ChessPosition(y+direction, x)) == null) && (board.getPiece(new ChessPosition(y+(2*direction), x)) == null) && (checkBounds(new ChessPosition(y + (2*direction), x)))){
+        if ((checkBounds(new ChessPosition(y + (2*direction), x))) && (y == startPosition) && (board.getPiece(new ChessPosition(y+direction, x)) == null) && (board.getPiece(new ChessPosition(y+(2*direction), x)) == null)){
             validPositions.add(new ChessMove(myPosition, new ChessPosition(y+(2*direction), x), null));
         }
         //capture in diagonal
-        if (board.getPiece(new ChessPosition(y+direction, x+1)) != null && (board.getPiece(myPosition).getTeamColor() != board.getPiece(new ChessPosition(y+direction, x+1)).getTeamColor()) && checkBounds(new ChessPosition(y+direction, x+1))){
+        if ((checkBounds(new ChessPosition(y+direction, x+1))) && (board.getPiece(new ChessPosition(y+direction, x+1)) != null) && (board.getPiece(myPosition).getTeamColor() != board.getPiece(new ChessPosition(y+direction, x+1)).getTeamColor())){
             if(!checkPromotion(myPosition, new ChessPosition(y+direction, x+1),promoPosition,validPositions)){
                 validPositions.add(new ChessMove(myPosition, new ChessPosition(y + direction, x + 1), null));
             }
         }
         //capture in diagonal
-        if (board.getPiece(new ChessPosition(y+direction, x-1)) != null && (board.getPiece(myPosition).getTeamColor() != board.getPiece(new ChessPosition(y+direction, x-1)).getTeamColor()) && (checkBounds(new ChessPosition(y+direction, x-1)))){
+        if ((checkBounds(new ChessPosition(y+direction, x-1))) && (board.getPiece(new ChessPosition(y+direction, x-1))) != null && (board.getPiece(myPosition).getTeamColor() != board.getPiece(new ChessPosition(y+direction, x-1)).getTeamColor())){
             if(!checkPromotion(myPosition, new ChessPosition(y+direction, x-1),promoPosition,validPositions)){
                 validPositions.add( new ChessMove(myPosition, new ChessPosition(y+direction, x-1), null));
             }
