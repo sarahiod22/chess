@@ -1,7 +1,6 @@
 package chess.piecesmoves;
 
 import chess.*;
-import com.sun.source.tree.BreakTree;
 
 import java.util.HashSet;
 
