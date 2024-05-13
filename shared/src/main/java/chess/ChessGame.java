@@ -100,7 +100,24 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        //check if it's team's turn, throw exception if not
+        //check if move is valid (move is in validMoves), throw exception if not
+        //make the movement
+        /*
+        board.removePiece(possibleMove.getStartPosition());
+        if (possibleMove.getPromotionPiece() != null){
+            ChessPiece promotedPiece = new ChessPiece(currentPiece.getTeamColor(), possibleMove.getPromotionPiece());
+            board.addPiece(possibleMove.getEndPosition(), promotedPiece);
+        }else {
+            board.addPiece(possibleMove.getEndPosition(), currentPiece);
+        }
+         */
+        //change the team turn
+        if(this.teamTurn == TeamColor.WHITE){
+            this.teamTurn = TeamColor.BLACK;
+        } else{
+            this.teamTurn = TeamColor.WHITE;
+        }
     }
 
     private ChessPosition kingPosition(TeamColor teamColor){
@@ -148,7 +165,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //if not in check, false
+        //check all the pieces of the team and if there still valid moves (validMoves is not empty), and that move gets it out of check, false
+        //else true???
+        return true;
     }
 
     /**
@@ -159,7 +179,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //if in check, false
+        //check all the pieces of the team and if there still valid moves (validMoves is not empty), false
+        //else true???
+        return true;
     }
 
     /**
