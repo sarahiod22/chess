@@ -47,10 +47,8 @@ public class ChessGame {
     private boolean validateMove(ChessMove possibleMove){
         boolean isValidMove = false;
         ChessPiece currentPiece = board.getPiece(possibleMove.getStartPosition());
-        ChessPiece destinationPiece = board.getPiece(possibleMove.getEndPosition());
         ChessBoard starterBoard = new ChessBoard();
-
-        //make a copy of the starter board before trying moves
+        //make a copy of starter board
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 if (board.getPiece(new ChessPosition(i+1, j+1)) != null){
@@ -58,7 +56,6 @@ public class ChessGame {
                 }
             }
         }
-
         //try move
         board.removePiece(possibleMove.getStartPosition());
         if (possibleMove.getPromotionPiece() != null){
@@ -106,6 +103,20 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    private ChessPosition kingPosition(TeamColor teamColor){
+        ChessPosition kingPosition = null;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition position = new ChessPosition(i+1, j+1);
+                ChessPiece piece = board.getPiece(position);
+                if (board.getPiece(position) != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    kingPosition = position;
+                }
+            }
+        }
+        return kingPosition;
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -113,7 +124,21 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean isInCheck = false;
+        Collection<ChessMove> opponentMoves = new HashSet<>();
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                ChessPiece piece = board.getPiece(new ChessPosition(i+1, j+1));
+                if (piece != null && piece.getTeamColor() != teamColor){
+                    opponentMoves.addAll(piece.pieceMoves(board, new ChessPosition(i+1, j+1)));
+                }
+            }
+        }
+        for (ChessMove move : opponentMoves){
+            if (move.getEndPosition() == kingPosition(teamColor))
+                isInCheck = true;
+        }
+        return isInCheck;
     }
 
     /**
