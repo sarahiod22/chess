@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -100,18 +99,22 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        //check if it's team's turn, throw exception if not
-        //check if move is valid (move is in validMoves), throw exception if not
-        //make the movement
-        /*
-        board.removePiece(possibleMove.getStartPosition());
-        if (possibleMove.getPromotionPiece() != null){
-            ChessPiece promotedPiece = new ChessPiece(currentPiece.getTeamColor(), possibleMove.getPromotionPiece());
-            board.addPiece(possibleMove.getEndPosition(), promotedPiece);
-        }else {
-            board.addPiece(possibleMove.getEndPosition(), currentPiece);
+        ChessPiece currentPiece = board.getPiece(move.getStartPosition());
+        TeamColor currentColor = currentPiece.getTeamColor();
+        Collection<ChessMove>validMoves = validMoves(move.getStartPosition());
+        if ((validMoves == null) || (currentColor != teamTurn) || !(validMoves.contains(move))){
+            throw new InvalidMoveException("Invalid Move");
         }
-         */
+        if (validMoves.contains(move)){
+            board.removePiece(move.getStartPosition());
+            if (move.getPromotionPiece() != null){
+                ChessPiece promotedPiece = new ChessPiece(currentPiece.getTeamColor(), move.getPromotionPiece());
+                board.addPiece(move.getEndPosition(), promotedPiece);
+            }else {
+                board.addPiece(move.getEndPosition(), currentPiece);
+            }
+        }
+
         //change the team turn
         if(this.teamTurn == TeamColor.WHITE){
             this.teamTurn = TeamColor.BLACK;
@@ -200,7 +203,7 @@ public class ChessGame {
         if (isInCheck(teamColor)){
             return false;
         }
-        //check all the pieces of the team and if there still valid moves (validMoves is not empty), false
+        //if there still valid moves (validMoves is not empty), false
         Collection<ChessMove> teamMoves = getMoves(teamColor, false);
         if (!teamMoves.isEmpty()){
             return false;
