@@ -166,8 +166,21 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         //if not in check, false
-        //check all the pieces of the team and if there still valid moves (validMoves is not empty), and that move gets it out of check, false
-        //else true???
+        if (!isInCheck(teamColor)){
+            return false;
+        }
+        //if there still valid moves (validMoves is not empty), false
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                ChessPiece piece = board.getPiece(new ChessPosition(i+1, j+1));
+                if (piece != null && piece.getTeamColor() == teamColor){
+                    if (validMoves(new ChessPosition(i+1, j+1)) != null){
+                        return false;
+                    }
+                }
+            }
+        }
+        //else true?
         return true;
     }
 
