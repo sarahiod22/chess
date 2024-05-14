@@ -193,8 +193,21 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //if in check, false
+        if (isInCheck(teamColor)){
+            return false;
+        }
         //check all the pieces of the team and if there still valid moves (validMoves is not empty), false
-        //else true???
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                ChessPiece piece = board.getPiece(new ChessPosition(i+1, j+1));
+                if (piece != null && piece.getTeamColor() == teamColor){
+                    if (validMoves(new ChessPosition(i+1, j+1)) != null){
+                        return false;
+                    }
+                }
+            }
+        }
+        //else true?
         return true;
     }
 
