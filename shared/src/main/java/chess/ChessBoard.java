@@ -38,7 +38,7 @@ public class ChessBoard {
 
     // Removes a chess piece of the chessboard
     public void removePiece(ChessPosition position){
-        this.squares[position.getRow()][position.getColumn()] = null;
+        this.squares[position.getRow() -1 ][position.getColumn() - 1] = null;
     }
 
     /**
