@@ -17,6 +17,7 @@ public class ChessGame {
     public ChessGame() {
         this.teamTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
+        board.resetBoard();
     }
 
     /**
@@ -158,8 +159,9 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         Collection<ChessMove> opponentMoves = getMoves(teamColor, true);
+        ChessPosition kingPosition = kingPosition(teamColor);
         for (ChessMove move : opponentMoves){
-            if (move.getEndPosition().equals(kingPosition(teamColor)))
+            if (move.getEndPosition().equals(kingPosition))
                 return true;
         }
         return false;
