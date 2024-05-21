@@ -11,7 +11,7 @@ public class GameDao implements IntGameDao{
 
     @Override
     public void createGame(GameData newGame) throws DataAccessException {
-
+        
     }
 
     @Override
