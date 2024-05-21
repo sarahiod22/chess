@@ -9,12 +9,13 @@ public class AuthDao implements IntAuthDao{
     private HashMap<String, AuthData> authTokens = new HashMap<>();
 
     @Override
-    public void createAuth(String username) throws DataAccessException {
+    public String createAuth(String username) throws DataAccessException {
         if (username == null || username.isEmpty()) {
             throw new DataAccessException("Username cannot be null or empty");
         }
         AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
         authTokens.put(authData.authToken(), authData);
+        return authData.authToken();
     }
 
     @Override
