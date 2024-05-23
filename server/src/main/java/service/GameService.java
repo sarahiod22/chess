@@ -15,5 +15,4 @@ public class GameService {
 
     public void joinGame(String authToken, String playerColor, int gameId){}
 
-    public void clear(){}
 }
