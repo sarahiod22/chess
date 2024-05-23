@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
@@ -18,9 +17,9 @@ public class GameService {
         this.gameDao = gameDao;
         this.authDao = authDao;
     }
-    public Collection<GameData> listGames(String authToken) throws IllegalArgumentException, DataAccessException {
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
         if (authToken == null || authToken.isEmpty() || authDao.getAuth(authToken) == null ) {
-            throw new IllegalArgumentException("Invalid auth token");
+            throw new DataAccessException("Invalid auth token");
         }
         try{
             return gameDao.listGames();
@@ -31,7 +30,7 @@ public class GameService {
 
     public Integer createGame(String authToken, GameData game) throws DataAccessException {
         if (authToken == null || authToken.isEmpty() || authDao.getAuth(authToken) == null || game == null || game.gameName() == null || game.gameName().isEmpty()) {
-            throw new IllegalArgumentException("Invalid auth token or game name empty");
+            throw new DataAccessException("Invalid auth token or game name empty");
         }
         try {
             return gameDao.createGame(game);

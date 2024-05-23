@@ -21,7 +21,7 @@ public class MemGameDao implements GameDao{
         try {
             return games.get(gameId);
         }catch (Exception e){
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Game not found");
         }
     }
 

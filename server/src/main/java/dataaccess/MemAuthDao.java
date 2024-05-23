@@ -35,7 +35,7 @@ public class MemAuthDao implements AuthDao{
         try {
             authTokens.remove(authToken);
         } catch (Exception e){
-            throw new DataAccessException("Auth token not found");
+            throw new DataAccessException("Auth token could not be removed");
         }
     }
 

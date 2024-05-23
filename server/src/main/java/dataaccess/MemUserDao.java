@@ -22,7 +22,7 @@ public class MemUserDao implements UserDao {
         try {
             return users.get(username);
         }catch(Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("User not found");
         }
     }
 

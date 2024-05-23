@@ -15,9 +15,9 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public AuthData register(UserData user) throws DataAccessException, IllegalArgumentException {
+    public AuthData register(UserData user) throws DataAccessException {
         if (user == null || user.username() == null || user.username().isEmpty() || user.password() == null || user.password().isEmpty() || user.email() == null || user.email().isEmpty()){
-            throw new IllegalArgumentException("Invalid data provided");
+            throw new DataAccessException("Invalid data provided");
         }
 
         try {
@@ -28,14 +28,14 @@ public class UserService {
         }
     }
 
-    public AuthData login(UserData user) throws DataAccessException, IllegalArgumentException {
+    public AuthData login(UserData user) throws DataAccessException {
         if (user == null || user.username() == null || user.username().isEmpty() || user.password() == null || user.password().isEmpty()){
-            throw new IllegalArgumentException("Not enough data provided");
+            throw new DataAccessException("Not enough data provided");
         }
         UserData currentUser = userDao.getUser(user.username());
 
         if (currentUser == null || !currentUser.password().equals(user.password())){
-            throw new IllegalArgumentException("Wrong user or password");
+            throw new DataAccessException("Wrong user or password");
         }
 
         try {
@@ -45,9 +45,9 @@ public class UserService {
         }
     }
 
-    public void logout(String authToken) throws DataAccessException, IllegalArgumentException {
+    public void logout(String authToken) throws DataAccessException {
         if (authToken == null || authToken.isEmpty()) {
-            throw new IllegalArgumentException("Invalid auth token");
+            throw new DataAccessException("Invalid auth token");
         }
         try {
             authDao.deleteAuth(authToken);
