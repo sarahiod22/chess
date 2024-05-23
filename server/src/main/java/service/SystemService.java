@@ -21,7 +21,7 @@ public class SystemService {
             authDao.clear();
             gameDao.clear();
         } catch (Exception e) {
-            throw new DataAccessException("Fail to clear data");
+            throw new DataAccessException("Failed to clear data");
         }
     }
 }
