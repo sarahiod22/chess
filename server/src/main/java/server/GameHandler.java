@@ -46,7 +46,7 @@ public class GameHandler {
             gameService.joinGame(req.headers("Authorization"), joinGameData.playerColor(), joinGameData.gameID());
             res.status(200);
             return "";
-        }catch (ResponseException e){
+        }catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
