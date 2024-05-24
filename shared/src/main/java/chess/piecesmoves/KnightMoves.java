@@ -19,17 +19,6 @@ public class KnightMoves {
                 new ChessPosition(y-1, x-2),
         };
 
-        HashSet<ChessMove> validPositions = new HashSet<>();
-
-        for(ChessPosition position : possiblePositions) {
-            if (position.getRow() < 1 || position.getRow() > 8 || position.getColumn() < 1 || position.getColumn() > 8)
-                continue;
-
-            if (board.getPiece(position) == null || board.getPiece(myPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                validPositions.add(new ChessMove(myPosition, position, null));
-            }
-        }
-
-        return validPositions;
+        return CommonMoves.checkPositions(possiblePositions,board,myPosition);
     }
 }
