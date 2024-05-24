@@ -1,12 +1,14 @@
 package dataaccess;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.ResponseException;
 import model.GameData;
 import java.util.Collection;
 
 public interface GameDao {
-    int createGame(GameData newGame) throws DataAccessException;
-    GameData getGame(int gameId) throws DataAccessException;
-    Collection<GameData> listGames() throws DataAccessException;
-    void updateGame(GameData game) throws DataAccessException; // not sure about parameter?
-    void clear() throws DataAccessException;
+    int createGame(GameData newGame) throws ResponseException;
+    GameData getGame(int gameId) throws ResponseException;
+    Collection<GameData> listGames();
+    void updateGame(GameData game) throws ResponseException; // not sure about parameter?
+    void clear() throws ResponseException;
 }

@@ -1,5 +1,7 @@
 package dataaccess;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 
 import java.util.HashMap;
@@ -9,9 +11,9 @@ public class MemAuthDao implements AuthDao{
     private HashMap<String, AuthData> authTokens = new HashMap<>();
 
     @Override
-    public AuthData createAuth(String username) throws DataAccessException {
+    public AuthData createAuth(String username) throws ResponseException {
         if (username == null || username.isEmpty()) {
-            throw new DataAccessException("Username cannot be null or empty");
+            throw new ResponseException(400, "Error: Empty username");
         }
         AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
         authTokens.put(authData.authToken(), authData);
@@ -19,32 +21,32 @@ public class MemAuthDao implements AuthDao{
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws ResponseException {
         try {
             return authTokens.get(authToken);
         } catch (Exception e){
-            throw new DataAccessException("Auth token not found");
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws ResponseException {
         if (!authTokens.containsKey(authToken)) {
-            throw new DataAccessException("Auth token not found");
+            throw new ResponseException(400, "Error: Auth token not found");
         }
         try {
             authTokens.remove(authToken);
         } catch (Exception e){
-            throw new DataAccessException("Auth token could not be removed");
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws ResponseException {
         try {
             authTokens.clear();
         } catch (Exception e){
-            throw new DataAccessException(e.getMessage());
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 }

@@ -1,8 +1,9 @@
 package service;
 
 import dataaccess.AuthDao;
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.DataAccessException;
 import dataaccess.GameDao;
+import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 import model.GameData;
 
@@ -17,43 +18,46 @@ public class GameService {
         this.gameDao = gameDao;
         this.authDao = authDao;
     }
-    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+    public Collection<GameData> listGames(String authToken) throws ResponseException {
         if (authToken == null || authToken.isEmpty() || authDao.getAuth(authToken) == null ) {
-            throw new DataAccessException("Invalid auth token");
+            throw new ResponseException(401, "Error: unauthorized");
         }
         try{
             return gameDao.listGames();
         } catch (Exception e) {
-            throw new DataAccessException("Failed to list games");
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
-    public Integer createGame(String authToken, GameData game) throws DataAccessException {
-        if (authToken == null || authToken.isEmpty() || authDao.getAuth(authToken) == null || game == null || game.gameName() == null || game.gameName().isEmpty()) {
-            throw new DataAccessException("Invalid auth token or game name empty");
+    public Integer createGame(String authToken, GameData game) throws ResponseException {
+        if (authToken == null || authToken.isEmpty() || authDao.getAuth(authToken) == null) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        if (game == null || game.gameName() == null || game.gameName().isEmpty()){
+            throw new ResponseException(400, "Error: bad request");
         }
         try {
             return gameDao.createGame(game);
         } catch (Exception e) {
-            throw new DataAccessException("Failed to create game");
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
-    public void joinGame(String authToken, String playerColor, int gameId) throws DataAccessException {
+    public void joinGame(String authToken, String playerColor, int gameId) throws ResponseException {
         AuthData auth = authDao.getAuth(authToken);
         GameData game = gameDao.getGame(gameId);
 
         if (authToken == null || authToken.isEmpty() || auth == null) {
-            throw new DataAccessException("Invalid auth token");
+            throw new ResponseException(401, "Error: unauthorized");
         }
         if (playerColor == null || playerColor.isEmpty() || gameId < -1 || game == null){
-            throw new DataAccessException("Invalid game");
+            throw new ResponseException(400, "Error: bad request");
         }
         if (playerColor.equals("WHITE") && game.whiteUsername() != null){
-            throw new DataAccessException("White username already exists");
+            throw new ResponseException(403, "Error: already taken");
         }
         if (playerColor.equals("BLACK") && game.blackUsername() != null){
-            throw new DataAccessException("Black username already exists");
+            throw new ResponseException(403, "Error: already taken");
         }
         try {
             if (playerColor.equals("WHITE")){
@@ -62,7 +66,7 @@ public class GameService {
                 gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
             }
         } catch (Exception e) {
-            throw new DataAccessException("Failed to update game");
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
 
     }

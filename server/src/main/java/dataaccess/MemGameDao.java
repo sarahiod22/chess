@@ -1,5 +1,7 @@
 package dataaccess;
 
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.ResponseException;
 import model.GameData;
 
 import java.util.Collection;
@@ -9,7 +11,7 @@ public class MemGameDao implements GameDao{
     private HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
-    public int createGame(GameData newGame) throws DataAccessException {
+    public int createGame(GameData newGame) throws ResponseException {
         int gameId = games.size()+1;
         GameData existingGame = new GameData(gameId, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
         games.put(gameId, existingGame);
@@ -17,34 +19,34 @@ public class MemGameDao implements GameDao{
     }
 
     @Override
-    public GameData getGame(int gameId) throws DataAccessException {
+    public GameData getGame(int gameId) throws ResponseException {
         try {
             return games.get(gameId);
         }catch (Exception e){
-            throw new DataAccessException("Game not found");
+            throw new ResponseException(400, "Error: Game not found");
         }
     }
 
     @Override
-    public Collection<GameData> listGames() throws DataAccessException {
+    public Collection<GameData> listGames() {
         return games.values();
     }
 
     @Override
-    public void updateGame(GameData game) throws DataAccessException {
+    public void updateGame(GameData game) throws ResponseException {
         if (games.containsKey(game.gameID())) {
             games.put(game.gameID(), game);
         } else {
-            throw new DataAccessException("Game not found");
+            throw new ResponseException(400, "Error: Game not found");
         }
     }
 
     @Override
-    public void clear() throws DataAccessException {
+    public void clear() throws ResponseException {
         try {
             games.clear();
         } catch (Exception e) {
-            throw new DataAccessException(e.getMessage());
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 }
