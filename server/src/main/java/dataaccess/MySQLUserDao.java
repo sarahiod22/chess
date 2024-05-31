@@ -5,6 +5,10 @@ import dataaccess.exceptions.ResponseException;
 import org.mindrot.jbcrypt.*;
 import model.UserData;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import static dataaccess.DatabaseManager.configureDatabase;
 
 public class MySQLUserDao implements UserDao{
@@ -35,26 +39,41 @@ public class MySQLUserDao implements UserDao{
 
     @Override
     public UserData getUser(String username) throws ResponseException {
-        return null;
+        String getStatement = "SELECT * FROM userData WHERE username = ?";
+        try (var conn = DatabaseManager.getConnection()){
+            PreparedStatement stmt = conn.prepareStatement(getStatement);
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+            } else {
+                return null;
+            }
+        }catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
     public void clear() throws ResponseException {
+        String deleteStatement = "DELETE FROM userData";
+        try (var conn = DatabaseManager.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
+            stmt.executeUpdate();
+        } catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
 
     }
 
     private String encryptPassword(String password) {
-        BCrypt encoder = new BCrypt();
-        String hashedPassword = encoder.hashpw(password, BCrypt.gensalt());
-        return hashedPassword;
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     //move it elsewhere?
     public boolean verifyUserPassword(String username, String providedPassword) throws ResponseException {
-        UserData userData = getUser(username);
-        BCrypt encoder = new BCrypt();
-        var hashedPassword = userData.password();
-        return encoder.checkpw(providedPassword, hashedPassword);
+        var hashedPassword = getUser(username).password();
+        return BCrypt.checkpw(providedPassword, hashedPassword);
     }
 
 }
