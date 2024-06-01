@@ -7,7 +7,7 @@ import org.junit.jupiter.api.*;
 public class SQLUserDaoTest {
     private final SQLUserDao userDao = new SQLUserDao();
     UserData validUserData = new UserData("sarahiod22", "password", "sarahi@gmail.com");
-    UserData invalidUserData = new UserData(null, "password", "sarahi@gmail.com");
+    UserData invalidUserData = new UserData(null, null, "sarahi@gmail.com");
 
     @BeforeEach
     void setUp() throws ResponseException {
@@ -25,12 +25,9 @@ public class SQLUserDaoTest {
     }
 
     @Test
-    void negativeCreateUserTest() throws ResponseException {
-        try {
-            userDao.createUser(invalidUserData);
-        } catch (ResponseException e) {
-            Assertions.assertEquals(500, e.getStatusCode());
-        }
+    void negativeCreateUserTest() {
+        ResponseException e = Assertions.assertThrows(ResponseException.class, () -> userDao.createUser(invalidUserData));
+        Assertions.assertEquals(500, e.getStatusCode());
     }
 
     @Test
@@ -42,11 +39,8 @@ public class SQLUserDaoTest {
 
     @Test
     void negativeGetUserTest() throws ResponseException {
-        try {
-            userDao.getUser(invalidUserData.username());
-        } catch (ResponseException e) {
-            Assertions.assertEquals(500, e.getStatusCode());
-        }
+        //user does not exist, so should return null
+        Assertions.assertNull(userDao.getUser(invalidUserData.username()));
     }
 
     @Test
