@@ -40,9 +40,8 @@ public class UserService {
         }
 
         UserData currentUser = userDao.getUser(user.username());
-        var hashedPassword = currentUser.password();
 
-        if (currentUser == null || !BCrypt.checkpw(user.password(), hashedPassword)){
+        if (currentUser == null || !BCrypt.checkpw(user.password(), currentUser.password())){
             throw new ResponseException(401, "Error: unauthorized");
         }
 
