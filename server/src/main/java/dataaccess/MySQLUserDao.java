@@ -4,12 +4,8 @@ import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.ResponseException;
 import org.mindrot.jbcrypt.*;
 import model.UserData;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static dataaccess.DatabaseManager.configureDatabase;
+import java.sql.*;
+import static dataaccess.DatabaseManager.*;
 
 public class MySQLUserDao implements UserDao{
 
@@ -39,11 +35,9 @@ public class MySQLUserDao implements UserDao{
 
     @Override
     public UserData getUser(String username) throws ResponseException {
-        String getStatement = "SELECT * FROM userData WHERE username = ?";
-        try (var conn = DatabaseManager.getConnection()){
-            PreparedStatement stmt = conn.prepareStatement(getStatement);
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM userData WHERE username = ?")){
             stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
+            var rs = stmt.executeQuery();
             if(rs.next()){
                 return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             } else {
@@ -56,9 +50,7 @@ public class MySQLUserDao implements UserDao{
 
     @Override
     public void clear() throws ResponseException {
-        String deleteStatement = "DELETE FROM userData";
-        try (var conn = DatabaseManager.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM userData")) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
@@ -70,7 +62,6 @@ public class MySQLUserDao implements UserDao{
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    //move it elsewhere?
     public boolean verifyUserPassword(String username, String providedPassword) throws ResponseException {
         var hashedPassword = getUser(username).password();
         return BCrypt.checkpw(providedPassword, hashedPassword);
