@@ -13,7 +13,7 @@ import static dataaccess.DatabaseManager.configureDatabase;
 
 public class SQLGameDao implements GameDao{
 
-    private static final String[] createTableStatements = {
+    private static final String[] CREATE_TABLE_STMT = {
             """
             CREATE TABLE IF NOT EXISTS  gameData (
                 `gameId` int UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -27,7 +27,7 @@ public class SQLGameDao implements GameDao{
 
     public SQLGameDao() {
         try {
-            configureDatabase(createTableStatements);
+            configureDatabase(CREATE_TABLE_STMT);
         } catch (DataAccessException e){
             throw new RuntimeException("Unable to create game's table", e);
         }

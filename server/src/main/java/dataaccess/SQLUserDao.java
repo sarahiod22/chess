@@ -9,7 +9,7 @@ import static dataaccess.DatabaseManager.*;
 
 public class SQLUserDao implements UserDao{
 
-    private static final String[] createTableStatements = {
+    private static final String[] CREATE_TABLE_STMT = {
             """
             CREATE TABLE IF NOT EXISTS  userData (
               `username` varchar(255) NOT NULL,
@@ -21,7 +21,7 @@ public class SQLUserDao implements UserDao{
 
     public SQLUserDao() {
         try {
-            configureDatabase(createTableStatements);
+            configureDatabase(CREATE_TABLE_STMT);
         } catch (DataAccessException e){
             throw new RuntimeException("Unable to create user's table", e);
         }

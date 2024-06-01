@@ -3,7 +3,6 @@ package dataaccess;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.ResponseException;
 import model.AuthData;
-import model.UserData;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -11,7 +10,7 @@ import java.util.UUID;
 import static dataaccess.DatabaseManager.configureDatabase;
 
 public class SQLAuthDao implements AuthDao {
-    private static final String[] createTableStatements = {
+    private static final String[] CREATE_TABLE_STMT = {
             """
             CREATE TABLE IF NOT EXISTS  authData (
               `authToken` varchar(255) NOT NULL,
@@ -22,7 +21,7 @@ public class SQLAuthDao implements AuthDao {
 
     public SQLAuthDao() {
         try {
-            configureDatabase(createTableStatements);
+            configureDatabase(CREATE_TABLE_STMT);
         } catch (DataAccessException e){
             throw new RuntimeException("Unable to create auth's table", e);
         }
