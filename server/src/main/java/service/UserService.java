@@ -5,6 +5,7 @@ import dataaccess.UserDao;
 import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private UserDao userDao;
@@ -39,8 +40,9 @@ public class UserService {
         }
 
         UserData currentUser = userDao.getUser(user.username());
+        var hashedPassword = currentUser.password();
 
-        if (currentUser == null || !currentUser.password().equals(user.password())){
+        if (currentUser == null || !BCrypt.checkpw(user.password(), hashedPassword)){
             throw new ResponseException(401, "Error: unauthorized");
         }
 

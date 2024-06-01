@@ -66,9 +66,4 @@ public class SQLUserDao implements UserDao{
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    public boolean verifyUserPassword(String username, String providedPassword) throws ResponseException {
-        var hashedPassword = getUser(username).password();
-        return BCrypt.checkpw(providedPassword, hashedPassword);
-    }
-
 }

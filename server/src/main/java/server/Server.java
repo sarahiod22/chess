@@ -13,9 +13,9 @@ public class Server {
     private final SystemHandler systemHandler;
 
     public Server(){
-        UserDao userDao = new MemUserDao();
-        GameDao gameDao = new MemGameDao();
-        AuthDao authDao = new MemAuthDao();
+        SQLUserDao userDao = new SQLUserDao();
+        SQLGameDao gameDao = new SQLGameDao();
+        SQLAuthDao authDao = new SQLAuthDao();
         this.userHandler = new UserHandler(new UserService(userDao, authDao));
         this.gameHandler = new GameHandler(new GameService(gameDao,authDao));
         this.systemHandler = new SystemHandler(new SystemService(userDao, authDao, gameDao));
