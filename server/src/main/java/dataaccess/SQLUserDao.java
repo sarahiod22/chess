@@ -7,7 +7,7 @@ import model.UserData;
 import java.sql.*;
 import static dataaccess.DatabaseManager.*;
 
-public class MySQLUserDao implements UserDao{
+public class SQLUserDao implements UserDao{
 
     private static final String[] createTableStatements = {
             """
@@ -19,7 +19,7 @@ public class MySQLUserDao implements UserDao{
             )"""
     };
 
-    public MySQLUserDao() {
+    public SQLUserDao() {
         try {
             configureDatabase(createTableStatements);
         } catch (DataAccessException e){
@@ -28,9 +28,13 @@ public class MySQLUserDao implements UserDao{
     }
 
     @Override
-    public void createUser(UserData newUser) throws ResponseException, DataAccessException {
-        String insertStatement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
-        DatabaseManager.executeUpdate(insertStatement, newUser.username(), encryptPassword(newUser.password()), newUser.email());
+    public void createUser(UserData newUser) throws ResponseException {
+        try {
+            String insertStatement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
+            DatabaseManager.executeUpdate(insertStatement, newUser.username(), encryptPassword(newUser.password()), newUser.email());
+        }catch (DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override

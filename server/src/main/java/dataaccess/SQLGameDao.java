@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import static dataaccess.DatabaseManager.configureDatabase;
 
-public class MySQLGameDao implements GameDao{
+public class SQLGameDao implements GameDao{
 
     private static final String[] createTableStatements = {
             """
@@ -25,7 +25,7 @@ public class MySQLGameDao implements GameDao{
             )"""
     };
 
-    public MySQLGameDao() {
+    public SQLGameDao() {
         try {
             configureDatabase(createTableStatements);
         } catch (DataAccessException e){
@@ -34,9 +34,13 @@ public class MySQLGameDao implements GameDao{
     }
 
     @Override
-    public int createGame(GameData newGame) throws ResponseException, DataAccessException {
-        String insertStatement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+    public int createGame(GameData newGame) throws ResponseException {
+        try {
+            String insertStatement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+        }catch (DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@ import model.GameData;
 import java.util.Collection;
 
 public interface GameDao {
-    int createGame(GameData newGame) throws ResponseException, DataAccessException;
+    int createGame(GameData newGame) throws ResponseException;
     GameData getGame(int gameId) throws ResponseException;
     Collection<GameData> listGames() throws ResponseException;
     void updateGame(GameData game) throws ResponseException;
