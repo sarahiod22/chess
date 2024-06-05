@@ -90,8 +90,14 @@ public class ServerFacade {
         }
     }
 
-    public void clear() {
-        
+    public void clear() throws Exception {
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverUrl + "/db")).DELETE().build();
+
+        HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        if (httpResponse.statusCode() != 200){
+            throw new Exception("Error: " + httpResponse.statusCode() + " " + httpResponse.body());
+        }
     }
 
 
