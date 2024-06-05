@@ -1,16 +1,9 @@
 package ui;
 
 import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
-import model.ListGameData;
-import model.UserData;
-
+import model.*;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Collection;
+import java.net.http.*;
 import java.util.Map;
 
 public class ServerFacade {
