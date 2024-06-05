@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.exceptions.ResponseException;
 import model.GameData;
-import model.JoinGameRequest;
+import model.JoinGameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -42,7 +42,7 @@ public class GameHandler {
 
     public Object joinGame(Request req, Response res) {
         try {
-            JoinGameRequest joinGameData = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            JoinGameData joinGameData = new Gson().fromJson(req.body(), JoinGameData.class);
             gameService.joinGame(req.headers("Authorization"), joinGameData.playerColor(), joinGameData.gameID());
             res.status(200);
             return "";
