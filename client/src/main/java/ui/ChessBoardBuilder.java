@@ -4,6 +4,8 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static ui.EscapeSequences.*;
 
@@ -12,9 +14,9 @@ public class ChessBoardBuilder {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-        drawBoard(out, false); // White pieces at the top
-        drawDivider(out);      // Divider between boards
-        drawBoard(out, true);  // Black pieces at the top
+        drawBoard(out, true); // White pieces at the top
+        drawDivider(out);
+        drawBoard(out, false);  // Black pieces at the top
 
         out.print(SET_BG_COLOR_DARK_GREY);
     }
@@ -25,22 +27,21 @@ public class ChessBoardBuilder {
         ChessPiece[][] board = pieces.getBoard();
 
         String[] topBottomBorder = reversed
-                ? new String[]{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "} : new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
-        String[] leftRightBorder = reversed
-                ? new String[]{" 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 "}
-                : new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
+                ? new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "} :
+                new String[]{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "};
+        String[] leftRightBorder = new String[]{" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 "};
 
         // Top border
         letterBorder(out, topBottomBorder);
 
         // Main board
         if (reversed) {
-            for (int i = 7; i >= 0; i--) {
-                rowChecker(out, leftRightBorder[7 - i], board[i], i % 2 != 0);
+            for (int i = 0; i < 8; i++) {
+                rowChecker(out, leftRightBorder[i], board[i], i % 2 == 0, reversed);
             }
         } else {
-            for (int i = 0; i < 8; i++) {
-                rowChecker(out, leftRightBorder[i], board[i], i % 2 == 0);
+            for (int i = 7; i >= 0; i--) {
+                rowChecker(out, leftRightBorder[i], board[i], i % 2 != 0, reversed);
             }
         }
 
@@ -48,11 +49,15 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void rowChecker(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow) {
+    public static void rowChecker(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed) {
         numberBorder(out, rowLabel);
 
         String currentColor = isEvenRow ? SET_BG_COLOR_BEIGE : SET_BG_COLOR_BROWN;
         String alternateColor = isEvenRow ? SET_BG_COLOR_BROWN : SET_BG_COLOR_BEIGE;
+
+        if (reversed) {
+            Collections.reverse(Arrays.asList(row));
+        }
 
         for (ChessPiece piece : row) {
             out.print(currentColor);
@@ -108,6 +113,6 @@ public class ChessBoardBuilder {
     }
 
     public static void drawDivider(PrintStream out) {
-        out.println(SET_BG_COLOR_DARK_GREY + EMPTY.repeat(3));
+        out.println(SET_BG_COLOR_DARK_GREY + EMPTY.repeat(1));
     }
 }
