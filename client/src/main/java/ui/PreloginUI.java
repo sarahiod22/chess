@@ -1,43 +1,34 @@
 package ui;
 
-import model.AuthData;
-import model.UserData;
-
-import java.io.IOException;
+import model.*;
 import java.util.Scanner;
 
 public class PreloginUI {
 
-    private ServerFacade serverFacade;
-    private boolean loggedIn;
-    private AuthData authData;
-    private Scanner scanner;
+    private static ServerFacade serverFacade;
+    private static boolean loggedIn;
+    private static AuthData authData;
+    private static Scanner scanner;
 
     public PreloginUI(ServerFacade serverFacade) {
-        this.serverFacade = serverFacade;
-        this.loggedIn = false;
-        this.scanner = new Scanner(System.in);
-        this.authData = null;
+        serverFacade = serverFacade;
+        loggedIn = false;
+        authData = null;
+        scanner = new Scanner(System.in);
     }
 
-    public void preloginMenu() throws Exception {
+
+    public static void preloginMenu() throws Exception {
         System.out.println("Welcome to 240 Chess! Available commands:");
         System.out.println();
-        System.out.println("1. register");
-        System.out.println("2. login");
-        System.out.println("3. quit");
-        System.out.println("4. help");
+        System.out.println("1. \"register\"");
+        System.out.println("2. \"login\"");
+        System.out.println("3. \"quit\"");
+        System.out.println("4. \"help\"");
 
         String command = scanner.nextLine();
 
         switch (command) {
-            case "help":
-                System.out.println("register - to create a new account");
-                System.out.println("login - to play chess");
-                System.out.println("quit -  playing chess");
-                System.out.println("help - repeat commands");
-                preloginMenu();
-                break;
             case "register":
                 register();
                 break;
@@ -47,13 +38,20 @@ public class PreloginUI {
             case "quit":
                 System.out.println("Goodbye!");
                 System.exit(0);
+            case "help":
+                System.out.println("register - to create a new account");
+                System.out.println("login - to play chess");
+                System.out.println("quit -  exit the program");
+                System.out.println("help - repeat commands");
+                preloginMenu();
+                break;
             default:
                 System.out.println("Invalid command, please enter: register, login, quit, help");
                 preloginMenu();
         }
     }
 
-        private void register() throws Exception {
+        private static void register() throws Exception {
             try {
                 System.out.println("Enter your username: ");
                 String username = scanner.nextLine();
@@ -67,7 +65,7 @@ public class PreloginUI {
                 loggedIn = true;
                 System.out.println("You have registered your account and logged in successfully.");
 
-                //PostloginUI.postloginMenu();
+                PostloginUI.postloginMenu(authData, serverFacade);
 
             }catch (Exception e) {
                 System.out.println("Registration error: " + e.getMessage());
@@ -76,7 +74,7 @@ public class PreloginUI {
             }
         }
 
-        private void login() throws Exception {
+        private static void login() throws Exception {
             try {
                 System.out.println("Enter your username: ");
                 String username = scanner.nextLine();
@@ -88,7 +86,7 @@ public class PreloginUI {
                 loggedIn = true;
                 System.out.println("You have logged in successfully.");
 
-                //PostloginUI.postloginMenu();
+                PostloginUI.postloginMenu(authData, serverFacade);
 
             }catch (Exception e) {
                 System.out.println("Login error: " + e.getMessage());
