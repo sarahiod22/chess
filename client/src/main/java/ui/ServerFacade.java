@@ -7,7 +7,7 @@ import java.net.http.*;
 import java.util.Map;
 
 public class ServerFacade {
-    private String serverUrl;
+    private final String serverUrl;
 
 
     public ServerFacade(String serverUrl) {
