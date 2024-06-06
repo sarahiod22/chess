@@ -11,14 +11,8 @@ import static ui.EscapeSequences.*;
 
 public class ChessBoardBuilder {
     public static void main(String[] args) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-
-        out.print(ERASE_SCREEN);
-        drawBoard(out, true); // White pieces at the top
-        drawDivider(out);
-        drawBoard(out, false);  // Black pieces at the top
-
-        out.print(SET_BG_COLOR_DARK_GREY);
+        ChessBoardBuilder builder = new ChessBoardBuilder();
+        builder.printBoard();
     }
 
     public static void drawBoard(PrintStream out, boolean reversed) {
@@ -37,11 +31,11 @@ public class ChessBoardBuilder {
         // Main board
         if (reversed) {
             for (int i = 0; i < 8; i++) {
-                rowChecker(out, leftRightBorder[i], board[i], i % 2 == 0, reversed);
+                fillBoard(out, leftRightBorder[i], board[i], i % 2 == 0, reversed);
             }
         } else {
             for (int i = 7; i >= 0; i--) {
-                rowChecker(out, leftRightBorder[i], board[i], i % 2 != 0, reversed);
+                fillBoard(out, leftRightBorder[i], board[i], i % 2 != 0, reversed);
             }
         }
 
@@ -49,7 +43,7 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void rowChecker(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed) {
+    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed) {
         numberBorder(out, rowLabel);
 
         String currentColor = isEvenRow ? SET_BG_COLOR_BEIGE : SET_BG_COLOR_BROWN;
@@ -61,7 +55,7 @@ public class ChessBoardBuilder {
 
         for (ChessPiece piece : row) {
             out.print(currentColor);
-            piecePrint(out, piece);
+            printPiece(out, piece);
             // Alternate color
             String temp = currentColor;
             currentColor = alternateColor;
@@ -84,7 +78,7 @@ public class ChessBoardBuilder {
         out.print(SET_TEXT_COLOR_LIGHT_GREY + SET_BG_COLOR_BLACK + label);
     }
 
-    public static void piecePrint(PrintStream out, ChessPiece piece) {
+    public static void printPiece(PrintStream out, ChessPiece piece) {
         if (piece != null) {
             if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
                 out.print(SET_TEXT_COLOR_WHITE);
@@ -114,5 +108,16 @@ public class ChessBoardBuilder {
 
     public static void drawDivider(PrintStream out) {
         out.println(SET_BG_COLOR_DARK_GREY + EMPTY.repeat(1));
+    }
+
+    public void printBoard(){
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
+        out.print(ERASE_SCREEN);
+        drawBoard(out, true); // White pieces at the top
+        drawDivider(out);
+        drawBoard(out, false);  // Black pieces at the top
+
+        out.print(SET_BG_COLOR_DARK_GREY);
     }
 }
