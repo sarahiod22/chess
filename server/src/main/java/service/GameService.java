@@ -64,6 +64,8 @@ public class GameService {
                 gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName(), game.game()));
             } else if (playerColor.equals("BLACK")) {
                 gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
+            } else if (playerColor.equals("observer")) {
+                return;
             }
         } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());

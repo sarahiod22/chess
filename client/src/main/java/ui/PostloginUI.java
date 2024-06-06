@@ -109,7 +109,7 @@ public class PostloginUI {
                 serverFacade.joinGame(authData.authToken(), gameId, playerColor);
             }
 
-            serverFacade.joinGame(authData.authToken(), gameId, null);
+            serverFacade.joinGame(authData.authToken(), gameId, "observer");
             System.out.println("Joined game successfully.");
             ChessBoardBuilder chessBoard = new ChessBoardBuilder();
             chessBoard.printBoard();
