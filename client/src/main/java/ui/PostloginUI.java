@@ -3,6 +3,9 @@ package ui;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class PostloginUI {
@@ -70,7 +73,8 @@ public class PostloginUI {
             System.out.println("Game created successfully!");
             postloginMenu(authData, serverFacade);
         }catch (Exception e) {
-            System.out.println("Error creating the game: " + e.getMessage());
+            System.out.println("Error creating the game: Please provide valid game information");
+            System.out.println(" ");
             postloginMenu(authData, serverFacade);
         }
     }
@@ -78,42 +82,57 @@ public class PostloginUI {
     private static void listGames(AuthData authData, ServerFacade serverFacade) throws Exception {
         try {
             var games = serverFacade.listGames(authData.authToken());
-
+            int gameIDIndex = 1;
             if (games != null && !games.games().isEmpty()) {
                 System.out.println("List of current games:");
                 for (GameData game : games.games()) {
-                    System.out.println("Game ID: " + game.gameID());
+                    System.out.println("Game ID: " + gameIDIndex);
                     System.out.println("Game Name: " + game.gameName());
                     System.out.println("White Player: " + game.whiteUsername());
                     System.out.println("Black Player: " + game.blackUsername());
+                    System.out.println(" ");
+                    gameIDIndex++;
                 }
             } else {
                 System.out.println("No games available.");
             }
         } catch (Exception e) {
-            System.out.println("Error listing games: " + e.getMessage());
+            System.out.println("Error listing games");
+            System.out.println(" ");
             postloginMenu(authData, serverFacade);
         }
     }
 
     private static void joinGame(AuthData authData, ServerFacade serverFacade, boolean observer) throws Exception {
         try {
+            var games = serverFacade.listGames(authData.authToken());
+            Map<Integer, Integer> gamesIDs = new HashMap<>();
+            int gameIDIndex = 1;
+            if (games != null && !games.games().isEmpty()) {
+                for (GameData game : games.games()) {
+                    gamesIDs.put(gameIDIndex, game.gameID());
+                    gameIDIndex++;
+                }
+            }
+
             System.out.println("Enter the Game ID:");
             int gameId = scanner.nextInt();
             scanner.nextLine();
+            int actualGameId = gamesIDs.get(gameId);
 
             if (!observer) {
                 System.out.println("Enter player color (WHITE/BLACK):");
                 String playerColor = scanner.nextLine().toUpperCase();
-                serverFacade.joinGame(authData.authToken(), gameId, playerColor);
+                serverFacade.joinGame(authData.authToken(), actualGameId, playerColor);
             }
 
-            serverFacade.joinGame(authData.authToken(), gameId, "observer");
+            serverFacade.joinGame(authData.authToken(), actualGameId, "observer");
             System.out.println("Joined game successfully.");
             ChessBoardBuilder chessBoard = new ChessBoardBuilder();
             chessBoard.printBoard();
         }catch (Exception e) {
-            System.out.println("Error joining game: " + e.getMessage());
+            System.out.println("Error joining game: Please provide valid game information");
+            System.out.println(" ");
             postloginMenu(authData, serverFacade);
         }
     }
@@ -122,7 +141,7 @@ public class PostloginUI {
         try {
             serverFacade.logout(authData.authToken());
         }catch (Exception e) {
-            System.out.println("Error logging out: " + e.getMessage());
+            System.out.println("Error logging out");
         }
     }
 }

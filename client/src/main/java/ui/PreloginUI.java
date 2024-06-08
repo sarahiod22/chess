@@ -60,7 +60,8 @@ public class PreloginUI {
                 PostloginUI.postloginMenu(authData, serverFacade);
 
             }catch (Exception e) {
-                System.out.println("Registration error: " + e.getMessage());
+                System.out.println("Registration error: Please provide valid user information");
+                System.out.println(" ");
                 loggedIn = false;
                 preloginMenu();
             }
@@ -81,7 +82,8 @@ public class PreloginUI {
                 PostloginUI.postloginMenu(authData, serverFacade);
 
             }catch (Exception e) {
-                System.out.println("Login error: " + e.getMessage());
+                System.out.println("Login error: Unable to login with the information provided");
+                System.out.println(" ");
                 loggedIn = false;
                 preloginMenu();
             }
