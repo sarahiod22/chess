@@ -30,9 +30,11 @@ public class PostloginUI {
                     break;
                 case "join game":
                     joinGame(authData, serverFacade, false);
+                    postloginMenu(authData, serverFacade);
                     break;
                 case "observe game":
                     joinGame(authData, serverFacade, true);
+                    postloginMenu(authData, serverFacade);
                     break;
                 case "logout":
                     logout(authData, serverFacade);
@@ -73,7 +75,7 @@ public class PostloginUI {
         }
     }
 
-    private static void listGames(AuthData authData, ServerFacade serverFacade) {
+    private static void listGames(AuthData authData, ServerFacade serverFacade) throws Exception {
         try {
             var games = serverFacade.listGames(authData.authToken());
 
@@ -90,6 +92,7 @@ public class PostloginUI {
             }
         } catch (Exception e) {
             System.out.println("Error listing games: " + e.getMessage());
+            postloginMenu(authData, serverFacade);
         }
     }
 
@@ -111,6 +114,7 @@ public class PostloginUI {
             chessBoard.printBoard();
         }catch (Exception e) {
             System.out.println("Error joining game: " + e.getMessage());
+            postloginMenu(authData, serverFacade);
         }
     }
 
