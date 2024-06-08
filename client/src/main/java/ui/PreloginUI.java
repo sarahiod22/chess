@@ -5,18 +5,10 @@ import java.util.Scanner;
 
 public class PreloginUI {
 
-    private static ServerFacade serverFacade;
-    private static boolean loggedIn;
-    private static AuthData authData;
-    private static Scanner scanner;
-
-    public PreloginUI(ServerFacade serverFacade) {
-        serverFacade = serverFacade;
-        loggedIn = false;
-        authData = null;
-        scanner = new Scanner(System.in);
-    }
-
+    private static ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+    private static boolean loggedIn = false;
+    private static AuthData authData = null;
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void preloginMenu() throws Exception {
         System.out.println("Welcome to 240 Chess! Available commands:");

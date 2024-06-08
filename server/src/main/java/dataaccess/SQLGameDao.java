@@ -20,7 +20,7 @@ public class SQLGameDao implements GameDao{
                 `whiteUsername` varchar(255) NULL,
                 `blackUsername` varchar(255) NULL,
                 `gameName` varchar(255) NOT NULL,
-                `game` BLOB NULL,
+                `game` TEXT NULL,
                 PRIMARY KEY (`gameId`)
             )"""
     };
@@ -36,8 +36,11 @@ public class SQLGameDao implements GameDao{
     @Override
     public int createGame(GameData newGame) throws ResponseException {
         try {
+            ChessGame game = new ChessGame();
+            String gameJson = new Gson().toJson(game);
             String insertStatement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+            //return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), gameJson);
         }catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
@@ -62,11 +65,10 @@ public class SQLGameDao implements GameDao{
     @Override
     public Collection<GameData> listGames() throws ResponseException {
         Collection<GameData> games = new ArrayList<>();
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM gameData")){
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT gameId, whiteUsername, blackUsername, gameName  FROM gameData")){
             var rs = stmt.executeQuery();
             while (rs.next()) {
-                ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
+                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), null));
             }
             return games;
         } catch (SQLException | DataAccessException e){

@@ -6,11 +6,7 @@ import model.GameData;
 import java.util.Scanner;
 
 public class PostloginUI {
-    private static Scanner scanner;
-
-    public PostloginUI() {
-        scanner = new Scanner(System.in);
-    }
+    private static Scanner scanner = new Scanner(System.in);;
 
     public static void postloginMenu(AuthData authData, ServerFacade serverFacade) throws Exception {
         System.out.println("Available commands: ");
@@ -67,7 +63,7 @@ public class PostloginUI {
             System.out.println("Enter the name of the game: ");
             String gameName = scanner.nextLine();
 
-            GameData gameData = new GameData(0, null, null, gameName, new ChessGame());
+            GameData gameData = new GameData(0, null, null, gameName, null);
             serverFacade.createGame(authData.authToken(), gameData);
             System.out.println("Game created successfully!");
             postloginMenu(authData, serverFacade);
