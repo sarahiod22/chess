@@ -39,8 +39,8 @@ public class SQLGameDao implements GameDao{
             ChessGame game = new ChessGame();
             String gameJson = new Gson().toJson(game);
             String insertStatement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-            //return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
-            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), gameJson);
+            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+            //return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), gameJson);
         }catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
@@ -65,10 +65,11 @@ public class SQLGameDao implements GameDao{
     @Override
     public Collection<GameData> listGames() throws ResponseException {
         Collection<GameData> games = new ArrayList<>();
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT gameId, whiteUsername, blackUsername, gameName  FROM gameData")){
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT *  FROM gameData")){
             var rs = stmt.executeQuery();
             while (rs.next()) {
-                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), null));
+                ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
             }
             return games;
         } catch (SQLException | DataAccessException e){

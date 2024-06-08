@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDao;
-import dataaccess.MemAuthDao;
-import dataaccess.MemUserDao;
-import dataaccess.UserDao;
+import dataaccess.*;
 import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 import model.UserData;
@@ -17,8 +14,9 @@ public class UserUnitTests {
     UserData invalidUserData = new UserData(null, "password", null);
 
     @BeforeEach
-    public void setUp() {
-        UserDao userDao = new MemUserDao();
+    public void setUp() throws ResponseException {
+        UserDao userDao = new SQLUserDao();
+        userDao.clear();
         AuthDao authDao = new MemAuthDao();
         userService = new UserService(userDao, authDao);
     }
@@ -37,8 +35,8 @@ public class UserUnitTests {
     @Test
     public void positiveLoginTest() throws ResponseException{
         userService.register(validUserData);
-        //var authData = userService.login(validUserData);
-        //Assertions.assertNotNull(authData);
+        var authData = userService.login(validUserData);
+        Assertions.assertNotNull(authData);
     }
 
     @Test

@@ -50,25 +50,27 @@ public class GameService {
         if (authToken == null || authToken.isEmpty() || auth == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (playerColor == null || playerColor.isEmpty() || gameId < -1 || game == null){
+        if (playerColor == null || gameId < -1 || game == null){
             throw new ResponseException(400, "Error: bad request");
         }
-        if (playerColor.equals("WHITE") && game.whiteUsername() != null){
-            throw new ResponseException(403, "Error: already taken");
-        }
-        if (playerColor.equals("BLACK") && game.blackUsername() != null){
-            throw new ResponseException(403, "Error: already taken");
-        }
-        try {
-            if (playerColor.equals("WHITE")){
-                gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName(), game.game()));
-            } else if (playerColor.equals("BLACK")) {
-                gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
-            } else if (playerColor.equals("observer")) {
-                return;
+        if (!playerColor.isEmpty()) {
+            if (playerColor.equals("WHITE") && game.whiteUsername() != null) {
+                throw new ResponseException(403, "Error: already taken");
             }
-        } catch (Exception e) {
-            throw new ResponseException(500, "Error: " + e.getMessage());
+            if (playerColor.equals("BLACK") && game.blackUsername() != null) {
+                throw new ResponseException(403, "Error: already taken");
+            }
+            try {
+                if (playerColor.equals("WHITE")) {
+                    gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName(), game.game()));
+                } else if (playerColor.equals("BLACK")) {
+                    gameDao.updateGame(new GameData(gameId, game.whiteUsername(), auth.username(), game.gameName(), game.game()));
+                } else if (playerColor.equals("observer")) {
+                    return;
+                }
+            } catch (Exception e) {
+                throw new ResponseException(500, "Error: " + e.getMessage());
+            }
         }
 
     }

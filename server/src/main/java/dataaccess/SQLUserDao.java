@@ -39,7 +39,7 @@ public class SQLUserDao implements UserDao{
 
     @Override
     public UserData getUser(String username) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM userData WHERE username = ?")){
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT username, password, email FROM userData WHERE username = ?")){
             stmt.setString(1, username);
             var rs = stmt.executeQuery();
             if(rs.next()){
