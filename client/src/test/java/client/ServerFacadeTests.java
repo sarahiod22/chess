@@ -1,7 +1,6 @@
 package client;
 
-import dataaccess.exceptions.ResponseException;
-import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -14,6 +13,8 @@ public class ServerFacadeTests {
     private static ServerFacade serverFacade;
     UserData validUser = new UserData("player1", "password", "p1@email.com");
     UserData invalidUser = new UserData(null, "password", "p2@email.com");
+    GameData validGame = new GameData(1,"white", null, "game1", null);
+    GameData invalidGame = new GameData(-1,"white", "black", null, null);
 
     @BeforeAll
     public static void init() {
@@ -73,6 +74,43 @@ public class ServerFacadeTests {
     void positiveListGames() throws Exception {
         var authData = serverFacade.register(validUser);
         var games = serverFacade.listGames(authData.authToken());
+    }
+
+    @Test
+    void negativeListGames() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> serverFacade.listGames(null));
+    }
+
+    @Test
+    void positiveCreateGame() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var gameData = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertNotNull(gameData);
+    }
+
+    @Test
+    void negativeCreateGame() throws Exception {
+        //valid game, invalid authToken
+        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(null, validGame));
+        //valid authToken, invalid game
+        var authData = serverFacade.register(validUser);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(authData.authToken(), invalidGame));
+
+    }
+
+    @Test
+    void positiveJoinGame() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var gameData = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(authData.authToken(), gameData.gameID(), "BLACK"));
+    }
+
+    @Test
+    void negativeJoinGame() throws Exception {
+       //join the game where white is already taken
+        var authData = serverFacade.register(validUser);
+        var gameData = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.joinGame(authData.authToken(), gameData.gameID(), "WHITE"));
     }
 
 
