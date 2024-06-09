@@ -33,11 +33,11 @@ public class PostloginUI {
                     break;
                 case "join game":
                     joinGame(authData, serverFacade, false);
-                    postloginMenu(authData, serverFacade);
+                    //postloginMenu(authData, serverFacade);
                     break;
                 case "observe game":
                     joinGame(authData, serverFacade, true);
-                    postloginMenu(authData, serverFacade);
+                    //postloginMenu(authData, serverFacade);
                     break;
                 case "logout":
                     logout(authData, serverFacade);

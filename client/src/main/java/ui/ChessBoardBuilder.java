@@ -118,6 +118,6 @@ public class ChessBoardBuilder {
         drawDivider(out);
         drawBoard(out, false);  // Black pieces at the top
 
-        out.print(SET_BG_COLOR_DARK_GREY);
+        out.print(SET_BG_COLOR_BLACK);
     }
 }
