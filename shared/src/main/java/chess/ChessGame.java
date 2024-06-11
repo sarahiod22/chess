@@ -13,10 +13,12 @@ import java.util.Objects;
 public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard board;
+    private boolean endGame;
 
     public ChessGame() {
         this.teamTurn = TeamColor.WHITE;
         this.board = new ChessBoard();
+        this.endGame = false;
         board.resetBoard();
     }
 
@@ -34,6 +36,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         teamTurn = team;
+    }
+
+    public boolean getEndGame(){
+        return endGame;
+    }
+
+    public void setEndGame(){
+        endGame = true;
     }
 
     /**
@@ -94,6 +104,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (endGame){
+            throw new InvalidMoveException("Game is over :(");
+        }
         if (board.getPiece((move.getStartPosition())) != null) {
             Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
             if ((validMoves == null) || (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) || !(validMoves.contains(move))) {
