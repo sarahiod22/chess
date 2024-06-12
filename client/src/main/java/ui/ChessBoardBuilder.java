@@ -105,18 +105,19 @@ public class ChessBoardBuilder {
         }
     }
 
-    public static void drawDivider(PrintStream out) {
-        out.println(SET_BG_COLOR_DARK_GREY + EMPTY.repeat(1));
-    }
-
-    public void printBoard(){
+    public void printBoard(String playerColor){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-        drawBoard(out, true); // White pieces at the top
-        drawDivider(out);
-        drawBoard(out, false);  // Black pieces at the top
-
-        out.print(SET_BG_COLOR_BLACK);
+        if (playerColor.equals("BLACK")) {
+            drawBoard(out, true);
+        }else {
+            drawBoard(out, false);
+        }
+        out.print(RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 }
+
+//Are you still here?
+// yes mami, my charger was so slow so i got my laptop charger now, ill be up in a sec
+//ok bb, no worries <3
