@@ -10,15 +10,14 @@ import java.util.Collections;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardBuilder {
-    public static void main(String[] args) {
-        ChessBoardBuilder builder = new ChessBoardBuilder();
-        builder.printBoard();
+    private static ChessBoard gameBoard;
+
+    public ChessBoardBuilder(ChessBoard board) {
+        gameBoard = board;
     }
 
     public static void drawBoard(PrintStream out, boolean reversed) {
-        ChessBoard pieces = new ChessBoard();
-        pieces.resetBoard();
-        ChessPiece[][] board = pieces.getBoard();
+        ChessPiece[][] board = gameBoard.getBoard();
 
         String[] topBottomBorder = reversed
                 ? new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "} :

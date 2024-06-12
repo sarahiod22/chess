@@ -49,7 +49,7 @@ public class ServerFacade {
         this.makeRequest("PUT", path, requestBody, null, authToken);
     }
 
-    public void clearData() throws ResponseException {
+    public void clear() throws ResponseException {
         var path = "/db";
         this.makeRequest("DELETE", path, null, null, null);
     }
