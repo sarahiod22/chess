@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.SystemService;
 import service.UserService;
@@ -11,6 +12,7 @@ public class Server {
     private final UserHandler userHandler;
     private final GameHandler gameHandler;
     private final SystemHandler systemHandler;
+    private final WebSocketHandler webSocketHandler;
 
     public Server(){
         SQLUserDao userDao = new SQLUserDao();
@@ -19,12 +21,13 @@ public class Server {
         this.userHandler = new UserHandler(new UserService(userDao, authDao));
         this.gameHandler = new GameHandler(new GameService(gameDao,authDao));
         this.systemHandler = new SystemHandler(new SystemService(userDao, authDao, gameDao));
+        this.webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
-
         Spark.staticFiles.location("web");
+        Spark.webSocket("/connect", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user",(req, res) -> (userHandler.register(req, res)));
