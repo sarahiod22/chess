@@ -22,11 +22,12 @@ public class ConnectionManager {
         connections.remove(visitorName);
     }
 
-    public void broadcastButRoot(String excludeVisitorName, ServerMessage notification, Integer gameId) throws IOException {
+
+    public void broadcast(String excludeVisitor, ServerMessage notification, Integer gameId) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (!c.visitorName.equals(excludeVisitorName) && Objects.equals(c.gameId, gameId)) {
+                if (!(c.visitorName.equals(excludeVisitor)) && c.gameId == gameId) {
                     c.send(new Gson().toJson(notification));
                 }
             } else {
@@ -39,37 +40,4 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcastToRoot(String rootVisitorName, ServerMessage notification, Integer gameId) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (c.visitorName.equals(rootVisitorName) && Objects.equals(c.gameId, gameId)) {
-                    c.send(new Gson().toJson(notification));
-                }
-            } else {
-                removeList.add(c);
-            }
-        }
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.visitorName);
-        }
-    }
-
-    public void broadcastToAll(ServerMessage notification, Integer gameId) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (Objects.equals(c.gameId, gameId)) {
-                    c.send(new Gson().toJson(notification));
-                }
-            } else {
-                removeList.add(c);
-            }
-        }
-        // Clean up any connections that were left open.
-//        for (var c : removeList) {
-//            connections.remove(c.visitorName);
-//        }
-    }
 }

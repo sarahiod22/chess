@@ -39,7 +39,7 @@ public class SQLGameDao implements GameDao{
             ChessGame game = new ChessGame();
             String gameJson = new Gson().toJson(game);
             String insertStatement = "INSERT INTO gameData (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+            return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), gameJson);
             //return DatabaseManager.executeUpdate(insertStatement, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), gameJson);
         }catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
@@ -80,7 +80,8 @@ public class SQLGameDao implements GameDao{
     @Override
     public void updateGame(GameData game) throws ResponseException {
         try {
-            DatabaseManager.executeUpdate("UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?", game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameID());
+            String gameJson = new Gson().toJson(game.game());
+            DatabaseManager.executeUpdate("UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?", game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
         } catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }

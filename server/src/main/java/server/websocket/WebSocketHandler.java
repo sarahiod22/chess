@@ -49,15 +49,15 @@ public class WebSocketHandler {
             GameData gameData = gameDao.getGame(connect.gameId);
             connections.add(connect.getAuthString(), session, connect.gameId);
             //Server sends a LOAD_GAME message back to the root client
-            LoadGame loadGame = new LoadGame(gameData.game());
-            connections.broadcastToRoot(connect.getAuthString(), loadGame, connect.gameId);
+            LoadGame loadGame = new LoadGame(gameData);
+            connections.broadcast(connect.getAuthString(), loadGame, connect.gameId);
             //Server sends a Notification message to all other clients in that game informing them the root client connected
             if (connect.observer){
                 Notification notification = new Notification(authData.username() + "joined the game as observer");
-                connections.broadcastButRoot(connect.getAuthString(), notification, connect.gameId);
+                connections.broadcast(connect.getAuthString(), notification, connect.gameId);
             }else {
                 Notification notification = new Notification(authData.username() + "joined the game as " + connect.teamColor.toString());
-                connections.broadcastButRoot(connect.getAuthString(), notification, connect.gameId);
+                connections.broadcast(connect.getAuthString(), notification, connect.gameId);
             }
         }catch (ResponseException | IOException e){
         session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game")));
@@ -73,15 +73,15 @@ public class WebSocketHandler {
             gameData.game().makeMove(makeMove.move);
             gameDao.updateGame(new GameData(makeMove.gameId, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
             //load game message to all clients in the game
-            LoadGame loadGame = new LoadGame( gameData.game());
-            connections.broadcastToAll(loadGame, makeMove.gameId);
+            LoadGame loadGame = new LoadGame(gameData);
+            connections.broadcast(makeMove.getAuthString(), loadGame, makeMove.gameId);
             //Server sends a Notification message to all other clients in that game about the move
             Notification notification = new Notification(authData.username() + " made the following move: " + makeMove.move);
-            connections.broadcastButRoot(makeMove.getAuthString(), notification, makeMove.gameId);
+            connections.broadcast(makeMove.getAuthString(), notification, makeMove.gameId);
             //If the move results in check or checkmate the server sends a Notification message to all clients.
             if (gameData.game().isInCheckmate(ChessGame.TeamColor.WHITE) || gameData.game().isInCheckmate(ChessGame.TeamColor.BLACK) || gameData.game().isInCheck(ChessGame.TeamColor.WHITE) || gameData.game().isInCheck(ChessGame.TeamColor.BLACK)){
                 Notification notification2 = new Notification("Move resulted in check/checkmate");
-                connections.broadcastToAll(notification2, makeMove.gameId);
+                connections.broadcast(makeMove.getAuthString(), notification2, makeMove.gameId);
             }
 
         }catch (ResponseException | InvalidMoveException | IOException e){
@@ -102,7 +102,7 @@ public class WebSocketHandler {
             connections.remove(leave.getAuthString());
             //Server sends a Notification message to all clients in that game
             Notification notification = new Notification(authData.username() + " has left the game.");
-            connections.broadcastButRoot(leave.getAuthString(), notification, leave.gameId);
+            connections.broadcast(leave.getAuthString(), notification, leave.gameId);
         } catch (ResponseException | IOException e){
             session.getRemote().sendString(new Gson().toJson(new Error("Unable to resign")));
         }
@@ -122,7 +122,7 @@ public class WebSocketHandler {
             gameData.game().setEndGame();
             //Server sends a Notification message to all clients in that game
             Notification notification = new Notification(authData.username() + " has resigned.");
-            connections.broadcastToAll(notification, resign.gameId);
+            connections.broadcast("", notification, resign.gameId);
             connections.remove(resign.getAuthString());
         } catch (ResponseException | IOException e){
             session.getRemote().sendString(new Gson().toJson(new Error("Unable to resign")));

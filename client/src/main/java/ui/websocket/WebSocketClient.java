@@ -43,7 +43,7 @@ public class WebSocketClient {
     }
 
     public Collection<GameData> listGames() throws Exception {
-        return List.of(serverFacade.listGames(this.userToken.authToken()));
+        return (serverFacade.listGames(this.userToken.authToken()).games());
     }
 
     public GameData createGame(String gameName) throws Exception {
