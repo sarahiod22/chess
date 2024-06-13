@@ -35,6 +35,7 @@ public class Client implements NotificationHandler {
     private int currentGameId = -1;
     private String currentPlayerColor = "";
     private ChessBoard currentBoard = null;
+    private ChessGame currentGame = null;
 
     public void displayPreloginCommands() {
         System.out.println("1. \"register\"");
@@ -336,7 +337,7 @@ public class Client implements NotificationHandler {
 //            throw e;
 //        }
         if(currentBoard != null) {
-            ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard);
+            ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
             boardBuilder.printBoard(currentPlayerColor);
             displayIngameCommands();
         }
@@ -355,6 +356,8 @@ public class Client implements NotificationHandler {
                 ChessMove move = new ChessMove(start, end, null);
                 try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
+                    System.out.println("Move executed succesfully");
+                    displayIngameCommands();
                 } catch (Exception e) {
                     System.out.println("Error making move");
                 }
@@ -374,6 +377,7 @@ public class Client implements NotificationHandler {
             if (confirmation.equals("y")) {
                 webSocket.sendCommand(new Resign(authData.authToken(), currentGameId));
                 System.out.println("Game is over!");
+                displayIngameCommands();
             }
         }
         catch (Exception e) {
@@ -397,7 +401,15 @@ public class Client implements NotificationHandler {
 
     private void highlightMoves() throws Exception {
         try {
-            return;
+            if(currentBoard != null && currentGame!= null) {
+                System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
+                String positionInput = scanner.nextLine();
+                ChessPosition piecePosition = new ChessPosition(-1,-1);
+                piecePosition = piecePosition.getPositionFromString(positionInput);
+                ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
+                boardBuilder.highlightLegalMoves(piecePosition);
+                displayIngameCommands();
+            }
         }
         catch (Exception e) {
             throw e;
@@ -449,6 +461,7 @@ public class Client implements NotificationHandler {
 
     @Override
     public void loadGame(LoadGame loadGame) {
+        this.currentGame = loadGame.game.game();
         this.currentBoard = loadGame.game.game().getBoard();
         redraw();
     }

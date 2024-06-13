@@ -36,11 +36,11 @@ public class ChessPosition {
 
     public ChessPosition getPositionFromString(String s) {
         char colChar = Character.toLowerCase(s.charAt(0));
-        int col = colChar - 'a';
-        int row = Character.getNumericValue(s.charAt(1)) - 1;
+        int col = colChar - '_' + 1;
+        int row = Character.getNumericValue(s.charAt(1));
 
         // Check if the row and column values are within the valid range
-        if (col >= 0 && col <= 7 && row >= 0 && row <= 7) {
+        if (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
             return new ChessPosition(row, col);
         } else {
             return null;
