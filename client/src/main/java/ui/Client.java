@@ -1,25 +1,73 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import dataaccess.GameDao;
 import dataaccess.SQLGameDao;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
+import websocket.commands.Connect;
+import websocket.commands.Leave;
+import websocket.commands.MakeMove;
+import websocket.commands.Resign;
+import websocket.messages.Error;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 ;
-public class Client {
+public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+    private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/connect", this);
     private GameDao gameDao = new SQLGameDao();
     private Scanner scanner = new Scanner(System.in);
 
     private AuthData authData = null;
     private int currentGameId = -1;
     private String currentPlayerColor = "";
+    private ChessBoard currentBoard = null;
+
+    public void displayPreloginCommands() {
+        System.out.println("1. \"register\"");
+        System.out.println("2. \"login\"");
+        System.out.println("3. \"quit\"");
+        System.out.println("4. \"help\"");
+    }
+
+    public void displayPostloginCommands() {
+        System.out.println("1. \"create game\"");
+        System.out.println("2. \"list games\"");
+        System.out.println("3. \"join game\"");
+        System.out.println("4. \"observe game\"");
+        System.out.println("5. \"logout\"");
+        System.out.println("6. \"quit\"");
+        System.out.println("7. \"help\"");
+    }
+
+    public void displayIngameCommands() {
+        if(state == ClientState.IN_GAME) {
+            System.out.println("1. \"redraw\"");
+            System.out.println("2. \"leave\"");
+            System.out.println("3. \"make move\"");
+            System.out.println("4. \"resign\"");
+            System.out.println("5. \"highlight legal moves\"");
+            System.out.println("6. \"help\"");
+        }
+        else if(state == ClientState.OBSERVING) {
+            System.out.println("1. \"redraw\"");
+            System.out.println("2. \"leave\"");
+            System.out.println("3. \"help\"");
+        }
+    }
 
     public void run() throws Exception {
         System.out.println("Welcome to 240 Chess!");
@@ -29,10 +77,7 @@ public class Client {
             System.out.println("Available commands: ");
 
             if(state == ClientState.PRE_LOGIN) {
-                System.out.println("1. \"register\"");
-                System.out.println("2. \"login\"");
-                System.out.println("3. \"quit\"");
-                System.out.println("4. \"help\"");
+                displayPreloginCommands();
 
                 switch(scanner.nextLine()) {
                     case "1":
@@ -57,13 +102,7 @@ public class Client {
                 }
             }
             else if(state == ClientState.POST_LOGIN) {
-                System.out.println("1. \"create game\"");
-                System.out.println("2. \"list games\"");
-                System.out.println("3. \"join game\"");
-                System.out.println("4. \"observe game\"");
-                System.out.println("5. \"logout\"");
-                System.out.println("6. \"quit\"");
-                System.out.println("7. \"help\"");
+                displayPostloginCommands();
 
                 switch(scanner.nextLine()) {
                     case "1":
@@ -99,16 +138,7 @@ public class Client {
                         break;
                 }
             }
-            else if(state == ClientState.IN_GAME){
-                redraw();
-
-                System.out.println("1. \"redraw\"");
-                System.out.println("2. \"leave\"");
-                System.out.println("3. \"make move\"");
-                System.out.println("4. \"resign\"");
-                System.out.println("5. \"highlight legal moves\"");
-                System.out.println("6. \"help\"");
-
+            if(state == ClientState.IN_GAME){
                 switch(scanner.nextLine()) {
                     case "1":
                     case "redraw":
@@ -139,14 +169,7 @@ public class Client {
                         break;
                 }
             }
-            else {
-                // Observing
-                redraw();
-
-                System.out.println("1. \"redraw\"");
-                System.out.println("2. \"leave\"");
-                System.out.println("3. \"help\"");
-
+            else if (state == ClientState.OBSERVING){
                 switch(scanner.nextLine()) {
                     case "1":
                     case "redraw":
@@ -154,7 +177,7 @@ public class Client {
                         break;
                     case "2":
                     case "leave":
-                        state = ClientState.POST_LOGIN;
+                        leave();
                         break;
                     case "3":
                     case "help":
@@ -185,7 +208,9 @@ public class Client {
             state = ClientState.POST_LOGIN;
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to register with the information provided");
+            System.out.println(" ");
         }
     }
 
@@ -203,7 +228,9 @@ public class Client {
             state = ClientState.POST_LOGIN;
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to login with the information provided");
+            System.out.println(" ");
         }
     }
 
@@ -222,7 +249,9 @@ public class Client {
             System.out.println("Game created successfully!");
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to create game with the information provided");
+            System.out.println(" ");
         }
     }
 
@@ -245,7 +274,9 @@ public class Client {
             }
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to list games");
+            System.out.println(" ");
         }
     }
 
@@ -279,11 +310,15 @@ public class Client {
                 state = ClientState.OBSERVING;
             }
 
+            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
+
             System.out.println("Joined game successfully.");
 
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to join game with the information provided");
+            System.out.println(" ");
         }
     }
 
@@ -292,37 +327,77 @@ public class Client {
         state = ClientState.PRE_LOGIN;
     }
 
-    private void redraw() throws Exception {
-        try {
-            ChessBoardBuilder chessBoard = new ChessBoardBuilder(gameDao.getGame(currentGameId).game().getBoard());
-            chessBoard.printBoard(currentPlayerColor);
-        }
-        catch (Exception e) {
-            throw e;
+    private void redraw() {
+//        try {
+//            ChessBoardBuilder chessBoard = new ChessBoardBuilder(gameDao.getGame(currentGameId).game().getBoard());
+//            chessBoard.printBoard(currentPlayerColor);
+//        }
+//        catch (Exception e) {
+//            throw e;
+//        }
+        if(currentBoard != null) {
+            ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard);
+            boardBuilder.printBoard(currentPlayerColor);
+            displayIngameCommands();
         }
     }
 
     private void makeMove() throws Exception {
         try {
-
+            System.out.print("Enter move to execute (e.g., a1-a5): ");
+            String moveInput = scanner.nextLine();
+            String[] movePositions = moveInput.split("-");
+            ChessPosition start = new ChessPosition(-1,-1);
+            ChessPosition end = new ChessPosition(-1,-1);
+            start = start.getPositionFromString(movePositions[0].trim().toLowerCase());
+            end = end.getPositionFromString(movePositions[1].trim().toLowerCase());
+            if (start != null && end != null) {
+                ChessMove move = new ChessMove(start, end, null);
+                try {
+                    webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
+                } catch (Exception e) {
+                    System.out.println("Error making move");
+                }
+            }
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to make a move with the information provided");
+            System.out.println(" ");
         }
     }
 
     private void resign() throws Exception {
         try {
-
+            System.out.print("Are you sure you want to resign? [y/n]: ");
+            String confirmation = scanner.nextLine();
+            if (confirmation.equals("y")) {
+                webSocket.sendCommand(new Resign(authData.authToken(), currentGameId));
+                System.out.println("Game is over!");
+            }
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to resign the game");
+            System.out.println(" ");
+        }
+    }
+
+    private void leave() throws Exception {
+        try {
+            webSocket.sendCommand(new Leave(authData.authToken(), currentGameId));
+            state = ClientState.POST_LOGIN;
+        }
+        catch (Exception e) {
+            //throw e;
+            System.out.println("Unable to leave the game");
+            System.out.println(" ");
         }
     }
 
     private void highlightMoves() throws Exception {
         try {
-
+            return;
         }
         catch (Exception e) {
             throw e;
@@ -360,5 +435,21 @@ public class Client {
         System.out.println("redraw - redraw the chess board");
         System.out.println("leave - leave the current game");
         System.out.println("help - repeat commands");
+    }
+
+    @Override
+    public void notify(Notification notification) {
+
+    }
+
+    @Override
+    public void warn(Error error) {
+
+    }
+
+    @Override
+    public void loadGame(LoadGame loadGame) {
+        this.currentBoard = loadGame.game.game().getBoard();
+        redraw();
     }
 }

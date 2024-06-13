@@ -34,6 +34,19 @@ public class ChessPosition {
         return col;
     }
 
+    public ChessPosition getPositionFromString(String s) {
+        char colChar = Character.toLowerCase(s.charAt(0));
+        int col = colChar - 'a';
+        int row = Character.getNumericValue(s.charAt(1)) - 1;
+
+        // Check if the row and column values are within the valid range
+        if (col >= 0 && col <= 7 && row >= 0 && row <= 7) {
+            return new ChessPosition(row, col);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String toString() {
         return "ChessPosition{" +
