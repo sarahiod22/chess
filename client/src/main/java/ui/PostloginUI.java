@@ -132,7 +132,7 @@ public class PostloginUI {
             serverFacade.joinGame(authData.authToken(), actualGameId, "observer");
             System.out.println("Joined game successfully.");
             ChessBoardBuilder chessBoard = new ChessBoardBuilder(gameDao.getGame(actualGameId).game().getBoard(), gameDao.getGame(actualGameId).game());
-            chessBoard.printBoard("");
+            chessBoard.printBoard("", null);
         //}catch (Exception e) {
         //    System.out.println("Error joining game: Please provide valid game information");
         //    System.out.println(" ");

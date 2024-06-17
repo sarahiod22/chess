@@ -36,7 +36,7 @@ public class ChessPosition {
 
     public ChessPosition getPositionFromString(String s) {
         char colChar = Character.toLowerCase(s.charAt(0));
-        int col = colChar - '_' + 1;
+        int col = (colChar - 'a') + 1; //maybe not +1
         int row = Character.getNumericValue(s.charAt(1));
 
         // Check if the row and column values are within the valid range

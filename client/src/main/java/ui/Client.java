@@ -338,7 +338,7 @@ public class Client implements NotificationHandler {
 //        }
         if(currentBoard != null) {
             ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
-            boardBuilder.printBoard(currentPlayerColor);
+            boardBuilder.printBoard(currentPlayerColor, null);
             displayIngameCommands();
         }
     }
@@ -407,7 +407,7 @@ public class Client implements NotificationHandler {
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
                 piecePosition = piecePosition.getPositionFromString(positionInput);
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
-                boardBuilder.highlightLegalMoves(piecePosition);
+                boardBuilder.printBoard(currentPlayerColor, piecePosition);
                 displayIngameCommands();
             }
         }
