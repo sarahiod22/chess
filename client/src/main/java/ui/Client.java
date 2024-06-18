@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import dataaccess.GameDao;
 import dataaccess.SQLGameDao;
 import model.AuthData;
@@ -20,6 +17,7 @@ import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -55,19 +53,18 @@ public class Client implements NotificationHandler {
     }
 
     public void displayIngameCommands() {
-        if(state == ClientState.IN_GAME) {
-            System.out.println("1. \"redraw\"");
-            System.out.println("2. \"leave\"");
-            System.out.println("3. \"make move\"");
-            System.out.println("4. \"resign\"");
-            System.out.println("5. \"highlight legal moves\"");
-            System.out.println("6. \"help\"");
-        }
-        else if(state == ClientState.OBSERVING) {
-            System.out.println("1. \"redraw\"");
-            System.out.println("2. \"leave\"");
-            System.out.println("3. \"help\"");
-        }
+        System.out.println("1. \"redraw\"");
+        System.out.println("2. \"leave\"");
+        System.out.println("3. \"make move\"");
+        System.out.println("4. \"resign\"");
+        System.out.println("5. \"highlight legal moves\"");
+        System.out.println("6. \"help\"");
+    }
+
+    public void displayObservingCommands(){
+        System.out.println("1. \"redraw\"");
+        System.out.println("2. \"leave\"");
+        System.out.println("3. \"help\"");
     }
 
     public void run() throws Exception {
@@ -104,7 +101,6 @@ public class Client implements NotificationHandler {
             }
             else if(state == ClientState.POST_LOGIN) {
                 displayPostloginCommands();
-
                 switch(scanner.nextLine()) {
                     case "1":
                     case "create game":
@@ -140,6 +136,7 @@ public class Client implements NotificationHandler {
                 }
             }
             if(state == ClientState.IN_GAME){
+                displayIngameCommands();
                 switch(scanner.nextLine()) {
                     case "1":
                     case "redraw":
@@ -147,7 +144,7 @@ public class Client implements NotificationHandler {
                         break;
                     case "2":
                     case "leave":
-                        state = ClientState.POST_LOGIN;
+                        leave();
                         break;
                     case "3":
                     case "make move":
@@ -171,6 +168,7 @@ public class Client implements NotificationHandler {
                 }
             }
             else if (state == ClientState.OBSERVING){
+                displayObservingCommands();
                 switch(scanner.nextLine()) {
                     case "1":
                     case "redraw":
@@ -178,7 +176,7 @@ public class Client implements NotificationHandler {
                         break;
                     case "2":
                     case "leave":
-                        leave();
+                        state = ClientState.POST_LOGIN;
                         break;
                     case "3":
                     case "help":
@@ -329,17 +327,9 @@ public class Client implements NotificationHandler {
     }
 
     private void redraw() {
-//        try {
-//            ChessBoardBuilder chessBoard = new ChessBoardBuilder(gameDao.getGame(currentGameId).game().getBoard());
-//            chessBoard.printBoard(currentPlayerColor);
-//        }
-//        catch (Exception e) {
-//            throw e;
-//        }
         if(currentBoard != null) {
             ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
             boardBuilder.printBoard(currentPlayerColor, null);
-            displayIngameCommands();
         }
     }
 
@@ -350,14 +340,14 @@ public class Client implements NotificationHandler {
             String[] movePositions = moveInput.split("-");
             ChessPosition start = new ChessPosition(-1,-1);
             ChessPosition end = new ChessPosition(-1,-1);
-            start = start.getPositionFromString(movePositions[0].trim().toLowerCase());
-            end = end.getPositionFromString(movePositions[1].trim().toLowerCase());
+            start = start.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
             if (start != null && end != null) {
                 ChessMove move = new ChessMove(start, end, null);
                 try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
                     System.out.println("Move executed succesfully");
-                    displayIngameCommands();
+                    //displayIngameCommands();
                 } catch (Exception e) {
                     System.out.println("Error making move");
                 }
@@ -377,7 +367,6 @@ public class Client implements NotificationHandler {
             if (confirmation.equals("y")) {
                 webSocket.sendCommand(new Resign(authData.authToken(), currentGameId));
                 System.out.println("Game is over!");
-                displayIngameCommands();
             }
         }
         catch (Exception e) {
@@ -405,10 +394,9 @@ public class Client implements NotificationHandler {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = piecePosition.getPositionFromString(positionInput);
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
-                displayIngameCommands();
             }
         }
         catch (Exception e) {
@@ -439,7 +427,6 @@ public class Client implements NotificationHandler {
         System.out.println("make move - move one of your pieces");
         System.out.println("resign - leave and end the game");
         System.out.println("highlight legal moves - redraw board with valid moves for a piece");
-        System.out.println("quit - exit the program");
         System.out.println("help - repeat commands");
     }
 

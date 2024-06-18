@@ -34,13 +34,29 @@ public class ChessPosition {
         return col;
     }
 
-    public ChessPosition getPositionFromString(String s) {
+//    public ChessPosition getPositionFromString(String s) {
+//        char colChar = Character.toLowerCase(s.charAt(0));
+//        int col = (colChar - 'a') + 1; //maybe not +1
+//        int row = Character.getNumericValue(s.charAt(1));
+//
+//        // Check if the row and column values are within the valid range
+//        if (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
+//            return new ChessPosition(row, col);
+//        } else {
+//            return null;
+//        }
+//    }
+
+    public ChessPosition getPositionFromString(String s, boolean blackAtBottom) {
         char colChar = Character.toLowerCase(s.charAt(0));
-        int col = (colChar - 'a') + 1; //maybe not +1
+        int col = (colChar - 'a') + 1;
         int row = Character.getNumericValue(s.charAt(1));
 
         // Check if the row and column values are within the valid range
         if (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
+            if (blackAtBottom) {
+                row = 9 - row; // Invert the row if black is at the bottom
+            }
             return new ChessPosition(row, col);
         } else {
             return null;
