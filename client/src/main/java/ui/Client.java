@@ -25,7 +25,7 @@ import java.util.Scanner;
 public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
-    private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/connect", this);
+    private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/ws", this);
     private Scanner scanner = new Scanner(System.in);
 
     private AuthData authData = null;
@@ -63,7 +63,8 @@ public class Client implements NotificationHandler {
     public void displayObservingCommands(){
         System.out.println("1. \"redraw\"");
         System.out.println("2. \"leave\"");
-        System.out.println("3. \"help\"");
+        System.out.println("3. \"highlight legal moves\"");
+        System.out.println("4. \"help\"");
     }
 
     public void run() throws Exception {
@@ -178,6 +179,10 @@ public class Client implements NotificationHandler {
                         state = ClientState.POST_LOGIN;
                         break;
                     case "3":
+                    case "highlight legal moves":
+                        highlightMoves();
+                        break;
+                    case "4":
                     case "help":
                         helpObserving();
                         break;
@@ -247,9 +252,9 @@ public class Client implements NotificationHandler {
             System.out.println("Game created successfully!");
         }
         catch (Exception e) {
-            throw e;
-            //System.out.println("Unable to create game with the information provided");
-            //System.out.println(" ");
+            //throw e;
+            System.out.println("Unable to create game with the information provided");
+            System.out.println(" ");
         }
     }
 
@@ -343,11 +348,11 @@ public class Client implements NotificationHandler {
             end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
             if (start != null && end != null) {
                 ChessMove move = new ChessMove(start, end, null);
-                //try {
+                try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-                //} catch (Exception e) {
-                //    System.out.println("Error making move");
-                //}
+                } catch (Exception e) {
+                    System.out.println("Error making move");
+                }
             }
         }
         catch (Exception e) {
@@ -367,9 +372,9 @@ public class Client implements NotificationHandler {
             }
         }
         catch (Exception e) {
-            throw e;
-            //System.out.println("Unable to resign the game");
-            //System.out.println(" ");
+            //throw e;
+            System.out.println("Unable to resign the game");
+            System.out.println(" ");
         }
     }
 
@@ -397,7 +402,9 @@ public class Client implements NotificationHandler {
             }
         }
         catch (Exception e) {
-            throw e;
+            //throw e;
+            System.out.println("Unable to highlight valid moves.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -430,6 +437,7 @@ public class Client implements NotificationHandler {
     private void helpObserving() {
         System.out.println("redraw - redraw the chess board");
         System.out.println("leave - leave the current game");
+        System.out.println("highlight legal moves - redraw board with valid moves for a piece");
         System.out.println("help - repeat commands");
     }
 
