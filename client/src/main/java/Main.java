@@ -1,7 +1,5 @@
 import chess.*;
-import dataaccess.exceptions.ResponseException;
 import ui.Client;
-import ui.PreloginUI;
 
 public class Main {
     public static void main(String[] args) throws Exception {

@@ -1,8 +1,6 @@
 package ui;
 
 import chess.*;
-import dataaccess.GameDao;
-import dataaccess.SQLGameDao;
 import model.AuthData;
 import model.GameData;
 import model.UserData;

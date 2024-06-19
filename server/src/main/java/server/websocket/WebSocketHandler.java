@@ -1,9 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
-import chess.InvalidMoveException;
 import com.google.gson.Gson;
-import dataaccess.AuthDao;
 import dataaccess.SQLAuthDao;
 import dataaccess.SQLGameDao;
 import dataaccess.SQLUserDao;
@@ -11,15 +9,12 @@ import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
-        import websocket.messages.Error;
+import websocket.messages.Error;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -37,11 +32,6 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws ResponseException, IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-
-//        var authData = authDao.getAuth(action.getAuthString());
-//        var userData = userDao.getUser(authData.username());
-//        var gameData = gameDao.getGame(action.gameID);
-//        connections.add(userData.username(), session, gameData.gameID());
 
         switch (action.getCommandType()) {
             case CONNECT -> connect(new Gson().fromJson(message, Connect.class), session);
