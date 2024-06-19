@@ -345,7 +345,6 @@ public class Client implements NotificationHandler {
                 ChessMove move = new ChessMove(start, end, null);
                 //try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-                    //displayIngameCommands();
                 //} catch (Exception e) {
                 //    System.out.println("Error making move");
                 //}

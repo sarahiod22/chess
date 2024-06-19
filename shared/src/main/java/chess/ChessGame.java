@@ -57,18 +57,27 @@ public class ChessGame {
     private boolean validateMove(ChessMove possibleMove){
         ChessPosition startPosition = possibleMove.getStartPosition();
         ChessPiece currentPiece = board.getPiece(startPosition);
+
         //make a copy of starter board
-        //ChessBoard starterBoard = board.copy();
+        ChessBoard starterBoard = new ChessBoard();
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                if (board.getPiece(new ChessPosition(j+1, i+1)) != null){
+                    starterBoard.addPiece(new ChessPosition(j+1, i+1), board.getPiece(new ChessPosition(j+1, i+1)));
+                }
+            }
+        }
+
         //try move
         board.removePiece(startPosition);
         board.addPiece(possibleMove.getEndPosition(), currentPiece);
 
         boolean isValidMove = !isInCheck(currentPiece.getTeamColor());
 
-        board.removePiece(possibleMove.getEndPosition());
-        board.addPiece(startPosition, currentPiece);
+//        board.removePiece(possibleMove.getEndPosition());
+//        board.addPiece(startPosition, currentPiece);
 
-        //board = starterBoard;
+        board = starterBoard;
 
         return isValidMove;
     }
@@ -92,6 +101,10 @@ public class ChessGame {
             }
         }
         return validMoves;
+    }
+
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        makeMove(move, teamTurn);
     }
 
     /**

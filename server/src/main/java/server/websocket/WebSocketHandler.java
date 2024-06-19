@@ -1,4 +1,3 @@
-
 package server.websocket;
 
 import chess.ChessGame;
@@ -12,10 +11,12 @@ import dataaccess.exceptions.ResponseException;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
-import websocket.messages.Error;
+        import websocket.messages.Error;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
@@ -32,9 +33,16 @@ public class WebSocketHandler {
     private final SQLGameDao gameDao = new SQLGameDao();
     private final SQLAuthDao authDao = new SQLAuthDao();
 
+
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws ResponseException, IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
+
+        var authData = authDao.getAuth(action.getAuthString());
+        var userData = userDao.getUser(authData.username());
+        var gameData = gameDao.getGame(action.gameId);
+        connections.add(userData.username(), session, gameData.gameID());
+
         switch (action.getCommandType()) {
             case CONNECT -> connect(new Gson().fromJson(message, Connect.class), session);
             case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMove.class), session);
