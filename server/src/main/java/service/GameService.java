@@ -8,6 +8,7 @@ import model.AuthData;
 import model.GameData;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class GameService {
 
@@ -54,12 +55,12 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
         if (!playerColor.isEmpty()) {
-            if (playerColor.equals("WHITE") && game.whiteUsername() != null) {
+            if (playerColor.equals("WHITE") && !Objects.equals(game.whiteUsername(), auth.username()) ||
+                    playerColor.equals("BLACK") && !Objects.equals(game.blackUsername(), auth.username())
+            ) {
                 throw new ResponseException(403, "Error: already taken");
             }
-            if (playerColor.equals("BLACK") && game.blackUsername() != null) {
-                throw new ResponseException(403, "Error: already taken");
-            }
+
             try {
                 if (playerColor.equals("WHITE")) {
                     gameDao.updateGame(new GameData(gameId, auth.username(), game.blackUsername(), game.gameName(), game.game()));

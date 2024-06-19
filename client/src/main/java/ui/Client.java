@@ -26,7 +26,6 @@ public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
     private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/connect", this);
-    private GameDao gameDao = new SQLGameDao();
     private Scanner scanner = new Scanner(System.in);
 
     private AuthData authData = null;
@@ -208,8 +207,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to register with the information provided");
-            System.out.println(" ");
+            System.out.println("Unable to register with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -228,8 +227,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to login with the information provided");
-            System.out.println(" ");
+            System.out.println("Unable to login with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -248,9 +247,9 @@ public class Client implements NotificationHandler {
             System.out.println("Game created successfully!");
         }
         catch (Exception e) {
-            //throw e;
-            System.out.println("Unable to create game with the information provided");
-            System.out.println(" ");
+            throw e;
+            //System.out.println("Unable to create game with the information provided");
+            //System.out.println(" ");
         }
     }
 
@@ -274,8 +273,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to list games");
-            System.out.println(" ");
+            System.out.println("Unable to list games.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -316,8 +315,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to join game with the information provided");
-            System.out.println(" ");
+            System.out.println("Unable to join game with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -344,19 +343,18 @@ public class Client implements NotificationHandler {
             end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
             if (start != null && end != null) {
                 ChessMove move = new ChessMove(start, end, null);
-                try {
+                //try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-                    System.out.println("Move executed succesfully");
                     //displayIngameCommands();
-                } catch (Exception e) {
-                    System.out.println("Error making move");
-                }
+                //} catch (Exception e) {
+                //    System.out.println("Error making move");
+                //}
             }
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to make a move with the information provided");
-            System.out.println(" ");
+            System.out.println("Unable to make a move with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -370,9 +368,9 @@ public class Client implements NotificationHandler {
             }
         }
         catch (Exception e) {
-            //throw e;
-            System.out.println("Unable to resign the game");
-            System.out.println(" ");
+            throw e;
+            //System.out.println("Unable to resign the game");
+            //System.out.println(" ");
         }
     }
 
@@ -383,8 +381,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to leave the game");
-            System.out.println(" ");
+            System.out.println("Unable to leave the game.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -438,12 +436,12 @@ public class Client implements NotificationHandler {
 
     @Override
     public void notify(Notification notification) {
-
+        System.out.println("INFO: " + notification.message);
     }
 
     @Override
     public void warn(Error error) {
-
+        System.out.println("ERROR: " + error.errorMessage);
     }
 
     @Override

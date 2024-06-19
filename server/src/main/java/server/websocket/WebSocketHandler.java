@@ -21,6 +21,7 @@ import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 
 @WebSocket
@@ -53,10 +54,10 @@ public class WebSocketHandler {
             connections.connections.get(connect.getAuthString()).send(loadGame.toString());
             //Server sends a Notification message to all other clients in that game informing them the root client connected
             if (connect.observer){
-                Notification notification = new Notification(authData.username() + "joined the game as observer");
+                Notification notification = new Notification(authData.username() + " joined the game as observer");
                 connections.broadcast(connect.getAuthString(), notification, connect.gameId);
             }else {
-                Notification notification = new Notification(authData.username() + "joined the game as " + connect.teamColor.toString());
+                Notification notification = new Notification(authData.username() + " joined the game as " + connect.teamColor.toString());
                 connections.broadcast(connect.getAuthString(), notification, connect.gameId);
             }
         }
@@ -69,7 +70,7 @@ public class WebSocketHandler {
         try {
             AuthData authData = authDao.getAuth(makeMove.getAuthString());
             GameData gameData = gameDao.getGame(makeMove.gameId);
-            gameData.game().makeMove(makeMove.move);
+            gameData.game().makeMove(makeMove.move, Objects.equals(gameData.whiteUsername(), authData.username()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK);
             gameDao.updateGame(new GameData(makeMove.gameId, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
             //load game message to all clients in the game
             LoadGame loadGame = new LoadGame(gameData);
@@ -88,7 +89,7 @@ public class WebSocketHandler {
             }
 
         }catch (ResponseException | InvalidMoveException | IOException e){
-            session.getRemote().sendString(new Gson().toJson(new Error("Unable to make the move")));
+            session.getRemote().sendString(new Gson().toJson(new Error("Unable to make the move: " + e.getMessage())));
         }
     }
 

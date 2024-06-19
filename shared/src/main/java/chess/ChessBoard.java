@@ -99,4 +99,20 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
+    public ChessBoard copy() {
+        ChessBoard copy = new ChessBoard();
+
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                ChessPiece currentPiece = this.getPiece(new ChessPosition( j+1, i+1));
+                if (currentPiece != null) {
+                    copy.addPiece(
+                            new ChessPosition( j+1, i+1),
+                            new ChessPiece(currentPiece.getTeamColor(), currentPiece.getPieceType()));
+                }
+            }
+        }
+
+        return copy;
+    }
 }

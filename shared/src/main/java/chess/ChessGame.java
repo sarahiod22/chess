@@ -54,24 +54,21 @@ public class ChessGame {
         BLACK
     }
 
-    private boolean validateMove(ChessPosition startPosition, ChessMove possibleMove){
-        ChessPiece currentPiece = board.getPiece(possibleMove.getStartPosition());
-        ChessBoard starterBoard = new ChessBoard();
+    private boolean validateMove(ChessMove possibleMove){
+        ChessPosition startPosition = possibleMove.getStartPosition();
+        ChessPiece currentPiece = board.getPiece(startPosition);
         //make a copy of starter board
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                if (board.getPiece(new ChessPosition(j+1, i+1)) != null){
-                    starterBoard.addPiece(new ChessPosition( j+1, i+1), board.getPiece(new ChessPosition( j+1, i+1)));
-                }
-            }
-        }
+        //ChessBoard starterBoard = board.copy();
         //try move
         board.removePiece(startPosition);
         board.addPiece(possibleMove.getEndPosition(), currentPiece);
 
         boolean isValidMove = !isInCheck(currentPiece.getTeamColor());
 
-        board = starterBoard;
+        board.removePiece(possibleMove.getEndPosition());
+        board.addPiece(startPosition, currentPiece);
+
+        //board = starterBoard;
 
         return isValidMove;
     }
@@ -89,7 +86,7 @@ public class ChessGame {
         if (currentPiece != null) {
             Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, startPosition);
             for (ChessMove possibleMove : possibleMoves){
-                if (validateMove(startPosition, possibleMove)){
+                if (validateMove(possibleMove)){
                     validMoves.add(possibleMove);
                 }
             }
@@ -103,13 +100,21 @@ public class ChessGame {
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
+    public void makeMove(ChessMove move, TeamColor player) throws InvalidMoveException {
         if (endGame){
             throw new InvalidMoveException("Game is over :(");
         }
+        if(player != getTeamTurn()) {
+            throw new InvalidMoveException("It is the other team's turn");
+        }
+
         if (board.getPiece((move.getStartPosition())) != null) {
+            TeamColor pieceColor = board.getPiece(move.getStartPosition()).getTeamColor();
             Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-            if ((validMoves == null) || (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) || !(validMoves.contains(move))) {
+            if(pieceColor != teamTurn) {
+                throw new InvalidMoveException("You cannot move another player's pieces");
+            }
+            if ((validMoves == null) || !(validMoves.contains(move))) {
                 throw new InvalidMoveException("Invalid Move");
             }
             if (validMoves.contains(move)) {
@@ -129,7 +134,7 @@ public class ChessGame {
             }
         }
         else{
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Piece does not exist");
         }
     }
 
