@@ -1,6 +1,5 @@
 package ui.websocket;
 
-import chess.InvalidMoveException;
 import websocket.messages.*;
 import websocket.messages.Error;
 
